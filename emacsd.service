@@ -1,0 +1,10 @@
+[Unit]
+description=emacs server
+after=graphical.target
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/emacs --daemon
+
+[Install]
+WantedBy=default.target
