@@ -223,7 +223,7 @@ layers configuration. You are free to put any user code."
    ein:default-url-or-port "8215")
   (setq org-startup-truncated nil)
   (setq load-path
-        (append '("/home/stuart/.polymode")
+        (append '("~/.config/.spacemacs/.polymode")
                 load-path))
   (require 'poly-pythontex)
   ;; (add-to-list 'auto-mode-alist '("\\.tex" . poly-pythontex-mode))
