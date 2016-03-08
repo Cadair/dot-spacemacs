@@ -254,7 +254,7 @@ layers configuration. You are free to put any user code."
           (delete-frame)))
 
     ;;file to save todo items
-    (setq org-agenda-files (quote ("/home/stuart/SyncBox/ToDo.org")))
+    (setq org-agenda-files (quote ("~/SyncBox/ToDo.org")))
 
     ;;set priority range from A to C with default A
     (setq org-highest-priority ?A)
@@ -270,10 +270,10 @@ layers configuration. You are free to put any user code."
     (setq org-agenda-window-setup (quote current-window))
 
     (setq org-capture-templates
-          '(("t" "Tasks TODO" entry (file+headline "/home/stuart/SyncBox/ToDo.org" "Tasks") "* TODO [#B] %i%?\n SCHEDULED: %t\n" :immediate-finish)
-            ("x" "Review TODO" entry (file+headline "/home/stuart/SyncBox/ToDo.org" "Tasks") "* TODO Review %?%c\n SCHEDULED: %t\n%U\n%i\n" :immediate-finish)
-            ("i" "Work TODO" entry (file+headline "/home/stuart/SyncBox/ToDo.org" "Work") "* TODO  [#B]%? %c :work:\n SCHEDULED: %t\n%U\n%i\n" :immediate-finish )
-            ("w" "Work TODO" entry (file+headline "/home/stuart/SyncBox/ToDo.org" "Work") "* TODO  [#B]%? :work:\n SCHEDULED: %t\n%U\n%i\n" :immediate-finish )
+          '(("t" "Tasks TODO" entry (file+headline "~/SyncBox/ToDo.org" "Tasks") "* TODO [#B] %i%?\n SCHEDULED: %t\n" :immediate-finish)
+            ("x" "Review TODO" entry (file+headline "~/SyncBox/ToDo.org" "Tasks") "* TODO Review %?%c\n SCHEDULED: %t\n%U\n%i\n" :immediate-finish)
+            ("i" "Work TODO" entry (file+headline "~/SyncBox/ToDo.org" "Work") "* TODO  [#B]%? %c :work:\n SCHEDULED: %t\n%U\n%i\n" :immediate-finish )
+            ("w" "Work TODO" entry (file+headline "~/SyncBox/ToDo.org" "Work") "* TODO  [#B]%? :work:\n SCHEDULED: %t\n%U\n%i\n" :immediate-finish )
            )
     )
     ;;open agenda in current window
