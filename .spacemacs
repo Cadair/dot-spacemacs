@@ -28,7 +28,7 @@ values."
      emacs-lisp
      git
      markdown
-     ;; org
+     org
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
@@ -42,6 +42,9 @@ values."
      github
      yaml
      latex
+     tmux
+     ;; haskell
+     ;; csharp
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -50,7 +53,9 @@ values."
    dotspacemacs-additional-packages '(pkgbuild-mode
                                       cl-generic
                                       rst
-                                      editorconfig)
+                                      editorconfig
+                                      polymode)
+
 
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages '()
@@ -89,12 +94,13 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(spacemacs-dark
+   dotspacemacs-themes '(
+                         monokai
+                         spacemacs-dark
                          spacemacs-light
                          solarized-light
                          solarized-dark
                          leuven
-                         monokai
                          zenburn)
    ;; If non nil the cursor color matches the state color.
    dotspacemacs-colorize-cursor-according-to-state t
@@ -209,11 +215,115 @@ user code."
   "Configuration function for user code.
  This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
+  (spacemacs/set-leader-keys "at" 'ansi-term)
   (define-key evil-normal-state-map (kbd "K") 'scroll-down-command )
   (define-key evil-normal-state-map (kbd "J") 'scroll-up-command )
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
   (setq-default
    ein:default-url-or-port "8215")
+  (setq org-startup-truncated nil)
+  (setq load-path
+        (append '("/home/stuart/.polymode")
+                load-path))
+  (require 'poly-pythontex)
+  ;; (add-to-list 'auto-mode-alist '("\\.tex" . poly-pythontex-mode))
+
+
+  ;; Org Mode
+  ;; set key for agenda
+  (spacemacs/declare-prefix "o" "Org Mode Global")
+  (spacemacs/set-leader-keys "oa" 'org-agenda)
+  (spacemacs/set-leader-keys "ot" (lambda() (interactive)(find-file "~/SyncBox/ToDo.org")))
+  ;;capture todo items using C-c c t
+  (spacemacs/set-leader-keys "oc" 'org-capture)
+  (with-eval-after-load 'org
+
+    (require 'org-capture)
+    (require 'org-protocol)
+
+    (defadvice org-capture
+        (after make-full-window-frame activate)
+      "Advise capture to be the only window when used as a popup"
+      (if (equal "emacs-capture" (frame-parameter nil 'name))
+          (delete-other-windows)))
+
+    (defadvice org-capture-finalize
+        (after delete-capture-frame activate)
+      "Advise capture-finalize to close the frame"
+      (if (equal "emacs-capture" (frame-parameter nil 'name))
+          (delete-frame)))
+
+    ;;file to save todo items
+    (setq org-agenda-files (quote ("/home/stuart/SyncBox/ToDo.org")))
+
+    ;;set priority range from A to C with default A
+    (setq org-highest-priority ?A)
+    (setq org-lowest-priority ?C)
+    (setq org-default-priority ?A)
+
+    ;;set colours for priorities
+    (setq org-priority-faces '((?A . (:foreground "#F0DFAF" :weight bold))
+                               (?B . (:foreground "LightSteelBlue"))
+                               (?C . (:foreground "OliveDrab"))))
+
+    ;;open agenda in current window
+    (setq org-agenda-window-setup (quote current-window))
+
+    (setq org-capture-templates
+          '(("t" "Tasks TODO" entry (file+headline "/home/stuart/SyncBox/ToDo.org" "Tasks") "* TODO [#B] %i%?\n SCHEDULED: %t\n" :immediate-finish)
+            ("x" "Review TODO" entry (file+headline "/home/stuart/SyncBox/ToDo.org" "Tasks") "* TODO Review %?%c\n SCHEDULED: %t\n%U\n%i\n" :immediate-finish)
+            ("i" "Work TODO" entry (file+headline "/home/stuart/SyncBox/ToDo.org" "Work") "* TODO  [#B]%? %c :work:\n SCHEDULED: %t\n%U\n%i\n" :immediate-finish )
+            ("w" "Work TODO" entry (file+headline "/home/stuart/SyncBox/ToDo.org" "Work") "* TODO  [#B]%? :work:\n SCHEDULED: %t\n%U\n%i\n" :immediate-finish )
+           )
+    )
+    ;;open agenda in current window
+    (setq org-agenda-window-setup (quote current-window))
+    ;;warn me of any deadlines in next 7 days
+    (setq org-deadline-warning-days 7)
+    ;;show me tasks scheduled or due in next fortnight
+    ;; (setq org-agenda-span (quote fortnight))
+    ;;don't show tasks as scheduled if they are already shown as a deadline
+    (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+    ;;don't give awarning colour to tasks with impending deadlines
+    ;;if they are scheduled to be done
+    (setq org-agenda-skip-deadline-prewarning-if-scheduled (quote pre-scheduled))
+    ;;don't show tasks that are scheduled or have deadlines in the
+    ;;normal todo list
+    ;;(setq org-agenda-todo-ignore-deadlines (quote all))
+    ;;(setq org-agenda-todo-ignore-scheduled (quote all))
+    (setq org-agenda-skip-scheduled-if-done t)
+    ;;sort tasks in order of when they are due and then by priority
+    (setq org-agenda-sorting-strategy
+          (quote
+           ((agenda deadline-up priority-down)
+            (todo priority-down category-keep)
+            (tags priority-down category-keep)
+            (search category-keep)))
+          )
+    (setq org-fontify-done-headline t)
+    (custom-set-faces
+     '(org-done ((t (
+                                 :weight normal
+                                 :strike-through t))))
+     '(org-headline-done
+       ((((class color) (min-colors 16))
+         (:strike-through t)))))
+    )
+  (defun endless/visit-pull-request-url ()
+    "Visit the current branch's PR on Github."
+    (interactive)
+    (browse-url
+     (format "https://github.com/%s/pull/new/%s"
+             (replace-regexp-in-string
+              "\\`.+github\\.com:\\(.+\\)\\.git\\'" "\\1"
+              (magit-get "remote"
+                         (magit-get-remote)
+                         "url"))
+             (cdr (or (magit-get-remote-branch)
+                      (user-error "No remote branch"))))))
+  (eval-after-load 'magit
+    '(define-key magit-mode-map "V"
+       #'endless/visit-pull-request-url))
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
