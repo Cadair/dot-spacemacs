@@ -18,20 +18,23 @@ values."
    ;; of a list then all discovered layers will be installed.
    dotspacemacs-configuration-layers
    '(
+     nginx
+     ansible
+     javascript
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      auto-completion
-     ;; better-defaults
+     better-defaults
      emacs-lisp
      git
      markdown
      org
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
+     (shell :variables
+            shell-default-height 30
+            shell-default-position 'bottom)
      spell-checking
      syntax-checking
      version-control
@@ -43,6 +46,9 @@ values."
      yaml
      latex
      tmux
+     ;; mu4e
+     html
+     windows-scripts
      ;; haskell
      ;; csharp
      )
@@ -54,11 +60,14 @@ values."
                                       cl-generic
                                       rst
                                       editorconfig
-                                      polymode)
+                                      polymode
+                                      org-caldav
+                                      rudel
+                                      floobits)
 
 
    ;; A list of packages and/or extensions that will not be install and loaded.
-   dotspacemacs-excluded-packages '()
+   dotspacemacs-excluded-packages '(smartparens)
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
    ;; the list `dotspacemacs-configuration-layers'. (default t)
@@ -107,7 +116,7 @@ values."
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 13
+                               :size 15
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -194,7 +203,7 @@ values."
    dotspacemacs-highlight-delimiters 'all
    ;; If non nil advises quit functions to keep server open when quitting.
    ;; (default nil)
-   dotspacemacs-persistent-server nil
+   dotspacemacs-persistent-server t
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.
    ;; (default '("ag" "pt" "ack" "grep"))
@@ -203,128 +212,140 @@ values."
    ;; specified with an installed package.
    ;; Not used for now. (default nil)
    dotspacemacs-default-package-repository nil
+   ;;
+   exec-path-from-shell-check-startup-files nil
    ))
 
 (defun dotspacemacs/user-init ()
   "Initialization function for user code.
 It is called immediately after `dotspacemacs/init'.  You are free to put any
 user code."
+  ;; Change shell so grabbing envs works (Change it back later)
+  (setenv "SHELL" "/usr/bin/zsh")
   )
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
  This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
+
+  ;; Shortcut to start a terminal
   (spacemacs/set-leader-keys "at" 'ansi-term)
+  ;; Use K and J to page up and page down
   (define-key evil-normal-state-map (kbd "K") 'scroll-down-command )
   (define-key evil-normal-state-map (kbd "J") 'scroll-up-command )
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+
+  ;; Set default notebook port to be my background jupyter server
   (setq-default
    ein:default-url-or-port "8215")
-  (setq org-startup-truncated nil)
+
+  ;; PythonTeX Polymode
+  ;;;;;;;;;;;;;;;;;;;;;
   (setq load-path
         (append '("~/.config/spacemacs/.polymode/")
                 load-path))
   (require 'poly-pythontex)
+
+  ;; Disable automatic enable
   ;; (add-to-list 'auto-mode-alist '("\\.tex" . poly-pythontex-mode))
 
 
-  ;; Org Mode
-  ;; set key for agenda
+  ;;;;;;;;;;;;;;
+  ;; Org Mode ;;
+  ;;;;;;;;;;;;;;
+
+  ;; Global Key Bindings
+  ;;;;;;;;;;;;;;;;;;;;;;
   (spacemacs/declare-prefix "o" "Org Mode Global")
   (spacemacs/set-leader-keys "oa" 'org-agenda)
-  (spacemacs/set-leader-keys "ot" (lambda() (interactive)(find-file "~/SyncBox/ToDo.org")))
-  ;;capture todo items using C-c c t
+  (spacemacs/set-leader-keys "ot" (lambda() (interactive)(find-file "~/Notebooks/ToDo.org")))
+  (spacemacs/set-leader-keys "oh" 'org-insert-todo-heading)
+  (spacemacs/set-leader-keys "os" 'org-insert-todo-subheading)
   (spacemacs/set-leader-keys "oc" 'org-capture)
   (with-eval-after-load 'org
 
     (require 'org-capture)
     (require 'org-protocol)
+    (require 'org-habit)
 
-    (defadvice org-capture
-        (after make-full-window-frame activate)
-      "Advise capture to be the only window when used as a popup"
-      (if (equal "emacs-capture" (frame-parameter nil 'name))
-          (delete-other-windows)))
 
-    (defadvice org-capture-finalize
-        (after delete-capture-frame activate)
-      "Advise capture-finalize to close the frame"
-      (if (equal "emacs-capture" (frame-parameter nil 'name))
-          (delete-frame)))
+    (setq org-startup-truncated nil)
+    (load-file (expand-file-name "~/.config/spacemacs/bh-org.el"))
+    (load-file (expand-file-name "~/.config/spacemacs/cadair-org-mode.el"))
 
-    ;;file to save todo items
-    (setq org-agenda-files (quote ("~/SyncBox/ToDo.org")))
-
-    ;;set priority range from A to C with default A
-    (setq org-highest-priority ?A)
-    (setq org-lowest-priority ?C)
-    (setq org-default-priority ?A)
-
-    ;;set colours for priorities
-    (setq org-priority-faces '((?A . (:foreground "#F0DFAF" :weight bold))
-                               (?B . (:foreground "LightSteelBlue"))
-                               (?C . (:foreground "OliveDrab"))))
-
-    ;;open agenda in current window
-    (setq org-agenda-window-setup (quote current-window))
-
-    (setq org-capture-templates
-          '(("t" "Tasks TODO" entry (file+headline "~/SyncBox/ToDo.org" "Tasks") "* TODO [#B] %i%?\n SCHEDULED: %t\n" :immediate-finish)
-            ("x" "Review TODO" entry (file+headline "~/SyncBox/ToDo.org" "Tasks") "* TODO Review %?%c\n SCHEDULED: %t\n%U\n%i\n" :immediate-finish)
-            ("i" "Work TODO" entry (file+headline "~/SyncBox/ToDo.org" "Work") "* TODO  [#B]%? %c :work:\n SCHEDULED: %t\n%U\n%i\n" :immediate-finish )
-            ("w" "Work TODO" entry (file+headline "~/SyncBox/ToDo.org" "Work") "* TODO  [#B]%? :work:\n SCHEDULED: %t\n%U\n%i\n" :immediate-finish )
-           )
+    ;; End Org Mode Section
     )
-    ;;open agenda in current window
-    (setq org-agenda-window-setup (quote current-window))
-    ;;warn me of any deadlines in next 7 days
-    (setq org-deadline-warning-days 7)
-    ;;show me tasks scheduled or due in next fortnight
-    ;; (setq org-agenda-span (quote fortnight))
-    ;;don't show tasks as scheduled if they are already shown as a deadline
-    (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
-    ;;don't give awarning colour to tasks with impending deadlines
-    ;;if they are scheduled to be done
-    (setq org-agenda-skip-deadline-prewarning-if-scheduled (quote pre-scheduled))
-    ;;don't show tasks that are scheduled or have deadlines in the
-    ;;normal todo list
-    ;;(setq org-agenda-todo-ignore-deadlines (quote all))
-    ;;(setq org-agenda-todo-ignore-scheduled (quote all))
-    (setq org-agenda-skip-scheduled-if-done t)
-    ;;sort tasks in order of when they are due and then by priority
-    (setq org-agenda-sorting-strategy
-          (quote
-           ((agenda deadline-up priority-down)
-            (todo priority-down category-keep)
-            (tags priority-down category-keep)
-            (search category-keep)))
+
+  ;; ORG MODE CALENDAR
+  ;;;;;;;;;;;;;;;;;;;;
+  (require 'org-caldav)
+
+  ;; The CalDAV URL with your full and primary email address at the end.
+  (setq org-caldav-url "https://apps.kolabnow.com/calendars/stuart%40cadair.com")
+
+  ;; The name of your calendar, typically "Calendar" or similar
+  (setq org-caldav-calendar-id "26ad9118-3d38-4676-9d31-cb8f09d9b730")
+
+  ;; Local file that gets events from the server
+  (setq org-caldav-inbox "~/Notebooks/calendar.org")
+
+  ;; List of your org files here
+  (setq org-caldav-files org-agenda-files)
+
+  ;; Please make sure to set your correct timezone here
+  (setq org-icalendar-timezone "Europe/London")
+  (setq org-icalendar-date-time-format ";TZID=%Z:%Y%m%dT%H%M%S")
+
+  ;; GPG Encryption
+  ;;;;;;;;;;;;;;;;;
+  (require 'epa-file)
+  (epa-file-enable)
+
+
+
+  ;; Conda
+  ;;;;;;;;
+  (defun setenviron (envname) (interactive "sEnivronment name: ")
+          (let(
+              (envpath (concat "/opt/miniconda/envs/" envname))
+              )
+          (setenv "PATH" (concat (concat envpath "/bin:") (getenv "PATH")))
+          (setq exec-path (append exec-path '(concat envpath "/bin:")))
+          (pythonic-activate envpath)
           )
-    (setq org-fontify-done-headline t)
-    (custom-set-faces
-     '(org-done ((t (
-                                 :weight normal
-                                 :strike-through t))))
-     '(org-headline-done
-       ((((class color) (min-colors 16))
-         (:strike-through t)))))
-    )
-  (defun endless/visit-pull-request-url ()
-    "Visit the current branch's PR on Github."
-    (interactive)
-    (browse-url
-     (format "https://github.com/%s/pull/new/%s"
-             (replace-regexp-in-string
-              "\\`.+github\\.com:\\(.+\\)\\.git\\'" "\\1"
-              (magit-get "remote"
-                         (magit-get-remote)
-                         "url"))
-             (cdr (or (magit-get-remote-branch)
-                      (user-error "No remote branch"))))))
-  (eval-after-load 'magit
-    '(define-key magit-mode-map "V"
-       #'endless/visit-pull-request-url))
-)
+          )
+  (spacemacs/set-leader-keys "ae" 'setenviron)
+  (setq python-shell-interpreter "ipython" python-shell-interpreter-args "--simple-prompt --pprint")
+  (setq python-shell-completion-native-disabled-interpreters '("ipython"))
+  ;; TEST: Make TAB use company
+  ;;(global-set-key "\t" 'company-complete-common)
+  (setenv "SHELL" "/usr/bin/xonsh")
+
+ )
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(evil-want-Y-yank-to-eol t)
+ '(magit-pull-arguments nil)
+ '(org-agenda-files
+   (quote
+    ("~/Notebooks/DKIST.org" "~/Notebooks/DKISTWP1.org" "~/Notebooks/PyAstro17.org" "~/Notebooks/SunPy.org" "~/Notebooks/ToDo.org" "~/Notebooks/calendar.org" "~/Notebooks/refile.org")))
+ '(package-selected-packages
+   (quote
+    (floobits rudel nginx-mode jinja2-mode ansible-doc ansible web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern dash-functional tern coffee-mode insert-shebang hide-comnt pug-mode org goto-chg diminish yapfify uuidgen py-isort org-projectile org-download mwim mu4e-maildirs-extension mu4e-alert live-py-mode link-hint github-search flyspell-correct-helm flyspell-correct eyebrowse evil-visual-mark-mode evil-unimpaired evil-ediff eshell-z dumb-jump company-shell column-enforce-mode undo-tree yaml-mode xterm-color ws-butler window-numbering web-mode volatile-highlights vi-tilde-fringe toc-org tagedit spacemacs-theme spaceline powerline smooth-scrolling smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs rainbow-delimiters pyvenv pytest pyenv-mode py-yapf powershell popwin polymode pkgbuild-mode pip-requirements persp-mode pcre2el paradox hydra spinner page-break-lines orgit org-repo-todo org-present org-pomodoro alert log4e gntp org-plus-contrib org-caldav org-bullets open-junk-file neotree multi-term move-text mmm-mode markdown-toc markdown-mode magit-gitflow magit-gh-pulls macrostep lorem-ipsum linum-relative leuven-theme less-css-mode jade-mode info+ indent-guide ido-vertical-mode hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make projectile helm-gitignore helm-flyspell helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag haml-mode google-translate golden-ratio gnuplot gitignore-mode github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gist gh marshal logito pcache ht gh-md flycheck-pos-tip flycheck pkg-info epl flx-ido flx fish-mode fill-column-indicator fancy-battery expand-region exec-path-from-shell evil-visualstar evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit magit magit-popup git-commit with-editor evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-args evil-anzu anzu eval-sexp-fu highlight eshell-prompt-extras esh-help emmet-mode elisp-slime-nav ein request websocket editorconfig diff-hl define-word cython-mode company-web web-completion-data company-statistics company-quickhelp pos-tip company-auctex company-anaconda company clean-aindent-mode buffer-move bracketed-paste auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed auctex-latexmk auctex anaconda-mode pythonic f dash s aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core async ac-ispell auto-complete popup quelpa package-build use-package which-key bind-key bind-map evil monokai-theme)))
+ '(send-mail-function (quote smtpmail-send-it)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
+ '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
+ '(org-done ((t (:weight normal :strike-through t))))
+ '(org-headline-done ((((class color) (min-colors 16)) (:strike-through t)))))
