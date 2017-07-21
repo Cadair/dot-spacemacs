@@ -9,3 +9,7 @@ This is my spacemacs config to use it run the following in your home dir:
     systemctl enable --now --user emacsd.service
     
     ln -s ~/.config/spacemacs/.spacemacs ~/.spacemacs
+
+## Credit
+
+Much of this is adapted from http://doc.norang.ca/org-mode.html
