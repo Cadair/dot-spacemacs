@@ -43,6 +43,10 @@
                "* TODO %i%?\n" :clock-in t :clock-resume t)
               ("x" "review" entry (file cadair-capture-file)
                "* TODO Review %?%c\n" :clock-in t :clock-resume t)
+              ("L" "Protocol Link" entry (file cadair-capture-file)
+               "* TODO Review %? [[%:link][%:description]] \nCaptured On: %U")
+              ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+               "* TODO %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
               ("n" "note" entry (file cadair-capture-file)
                "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
               ("h" "Habit" entry (file cadair-capture-file)
@@ -124,6 +128,7 @@
               ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
               ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
               ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
+
 
 ;; Agenda
 ;;;;;;;;;
