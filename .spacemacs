@@ -31,39 +31,50 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
-     nginx
-     ansible
-     javascript
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
+     ;; Tools
      auto-completion
      better-defaults
-     emacs-lisp
-     git
-     markdown
-     org
-     (shell :variables
-            shell-default-height 30
-            shell-default-position 'bottom)
      spell-checking
      syntax-checking
      version-control
+     ranger
+     git
+     github
+
+     ;; Languages
+     (org :variables
+          org-enable-github-support t
+          org-enable-reveal-js-support t)
+     (shell :variables
+            shell-default-height 30
+            shell-default-position 'bottom)
+     emacs-lisp
      (python :variables
              python-test-runner 'pytest)
+     nginx
+     ansible
      ipython-notebook
      github
      yaml
+     markdown
      latex
-     ;; tmux
-     ;; mu4e
      html
-     windows-scripts
+     systemd
+     ;; javascript
+     ;; windows-scripts
      ;; haskell
      ;; csharp
-     ranger
+     ;; tmux
+     ;; mu4e
+
+     ;; random
+     xkcd
+
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -76,6 +87,7 @@ values."
                                       polymode
                                       org-caldav
                                       org-ref
+                                      flycheck-mypy
                                       floobits)
 
 
@@ -108,7 +120,7 @@ values."
    ;; when the current branch is not `develop'. Note that checking for
    ;; new versions works via git commands, thus it calls GitHub services
    ;; whenever you start Emacs. (default nil)
-   dotspacemacs-check-for-update nil
+   dotspacemacs-check-for-update t
    ;; If non-nil, a form that evaluates to a package directory. For example, to
    ;; use different package directories for different Emacs versions, set this
    ;; to `emacs-version'.
@@ -327,14 +339,15 @@ values."
 It is called immediately after `dotspacemacs/init'.  You are free to put any
 user code."
   ;; Change shell so grabbing envs works (Change it back later)
-  (setenv "SHELL" "/usr/bin/zsh")
+  (setenv "SHELL" "/usr/bin/sh")
   )
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
  This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
-
+  ;; Bug fix for https://github.com/syl20bnr/spacemacs/issues/9608
+  (require 'helm-bookmark)
   ;; Shortcut to start a terminal
   (spacemacs/set-leader-keys "at" 'ansi-term)
   ;; Use K and J to page up and page down
@@ -345,6 +358,13 @@ layers configuration. You are free to put any user code."
   ;; Set default notebook port to be my background jupyter server
   (setq-default
    ein:default-url-or-port "8215")
+
+  ;; Hide __pycache__ from neotree
+  (with-eval-after-load 'neotree
+    (setq-default neo-show-hidden-files t)
+    (add-to-list 'neo-hidden-regexp-list "__pycache__")
+    (add-to-list 'neo-hidden-regexp-list "\\.egg-info$")
+  )
 
   ;; PythonTeX Polymode
   ;;;;;;;;;;;;;;;;;;;;;
@@ -357,9 +377,17 @@ layers configuration. You are free to put any user code."
   ;; (add-to-list 'auto-mode-alist '("\\.tex" . poly-pythontex-mode))
 
 
+  ;; MyPy
+  (require 'flycheck-mypy)
+  (add-hook 'python-mode-hook 'flycheck-mode)
+
+
   ;;;;;;;;;;;;;;
   ;; Org Mode ;;
   ;;;;;;;;;;;;;;
+
+  ;; Latex Export Settings
+  (setq org-latex-caption-above nil)
 
   ;; Global Key Bindings
   ;;;;;;;;;;;;;;;;;;;;;;
@@ -418,7 +446,7 @@ layers configuration. You are free to put any user code."
               )
           (setenv "PATH" (concat (concat envpath "/bin:") (getenv "PATH")))
           (setq exec-path (append exec-path '(concat envpath "/bin:")))
-          (pythonic-activate envpath)
+          ;; (pythonic-activate envpath)
           )
           )
   (spacemacs/set-leader-keys "ae" 'setenviron)
@@ -440,7 +468,7 @@ layers configuration. You are free to put any user code."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
