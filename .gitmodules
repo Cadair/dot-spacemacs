@@ -1,0 +1,3 @@
+[submodule "ox-ipynb"]
+	path = ox-ipynb
+	url = https://github.com/jkitchin/ox-ipynb.git
