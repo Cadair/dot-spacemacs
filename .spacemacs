@@ -37,6 +37,7 @@ values."
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      ;; Tools
+     helm
      auto-completion
      better-defaults
      spell-checking
@@ -64,6 +65,7 @@ values."
      markdown
      latex
      html
+     javascript
      systemd
      ;; javascript
      ;; windows-scripts
@@ -74,7 +76,6 @@ values."
 
      ;; random
      xkcd
-
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -87,9 +88,9 @@ values."
                                       polymode
                                       org-caldav
                                       org-ref
-                                      flycheck-mypy
-                                      floobits)
-
+                                      org-plus-contrib
+                                      git-auto-commit-mode
+                                      conda)
 
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages '(smartparens)
@@ -348,6 +349,7 @@ user code."
 layers configuration. You are free to put any user code."
   ;; Bug fix for https://github.com/syl20bnr/spacemacs/issues/9608
   (require 'helm-bookmark)
+
   ;; Shortcut to start a terminal
   (spacemacs/set-leader-keys "at" 'ansi-term)
   ;; Use K and J to page up and page down
@@ -358,13 +360,15 @@ layers configuration. You are free to put any user code."
   ;; Set default notebook port to be my background jupyter server
   (setq-default
    ein:default-url-or-port "8215")
-
   ;; Hide __pycache__ from neotree
   (with-eval-after-load 'neotree
     (setq-default neo-show-hidden-files t)
     (add-to-list 'neo-hidden-regexp-list "__pycache__")
     (add-to-list 'neo-hidden-regexp-list "\\.egg-info$")
-  )
+    )
+
+  ;; git-auto-commit
+  (setq gac-automatically-push-p t)
 
   ;; PythonTeX Polymode
   ;;;;;;;;;;;;;;;;;;;;;
@@ -378,16 +382,25 @@ layers configuration. You are free to put any user code."
 
 
   ;; MyPy
-  (require 'flycheck-mypy)
-  (add-hook 'python-mode-hook 'flycheck-mode)
+  ;; (require 'flycheck-mypy)
+  ;; (add-hook 'python-mode-hook 'flycheck-mode)
+
+
+  ;; Jupyter Mode
+  ;;;;;;;;;;;;;;;
+
+  (spacemacs/set-leader-keys-for-major-mode 'ein:notebook-multilang-mode "r" 'ein:notebook-restart-kernel-command)
+  (spacemacs/set-leader-keys-for-major-mode 'ein:notebook-multilang-mode "e" 'ein:worksheet-execute-all-cell)
 
 
   ;;;;;;;;;;;;;;
   ;; Org Mode ;;
   ;;;;;;;;;;;;;;
+  (setq load-path
+        (append '("~/.config/spacemacs/ox-ipynb/")
+                load-path))
+  (require 'ox-ipynb)
 
-  ;; Latex Export Settings
-  (setq org-latex-caption-above nil)
 
   ;; Global Key Bindings
   ;;;;;;;;;;;;;;;;;;;;;;
@@ -437,28 +450,54 @@ layers configuration. You are free to put any user code."
   (epa-file-enable)
 
 
-
   ;; Conda
   ;;;;;;;;
-  (defun setenviron (envname) (interactive "sEnivronment name: ")
-          (let(
-              (envpath (concat "/opt/miniconda/envs/" envname))
-              )
-          (setenv "PATH" (concat (concat envpath "/bin:") (getenv "PATH")))
-          (setq exec-path (append exec-path '(concat envpath "/bin:")))
-          ;; (pythonic-activate envpath)
-          )
-          )
-  (spacemacs/set-leader-keys "ae" 'setenviron)
+
+  ;; Thanks to:
+  ;; https://github.com/necaris/conda.el
+
+  (require 'conda)
+
+  ;; if you want interactive shell support, include:
+  ;; (conda-env-initialize-interactive-shells)
+
+  ;; if you want eshell support, include:
+  ;; (conda-env-initialize-eshell)
+
+  (custom-set-variables
+   '(conda-anaconda-home "/opt/miniconda"))
+
+  ;; spacemacs doesn't pick up the env unless we run pyvenv-activate
+  ;; So use the conda.el machinery to also run pyvenv-activate
+  (defun cadair-conda-activate (&optional name)
+    (interactive)
+    (let ((env-name (or name (conda--get-env-name))))
+      (if (not (conda-env-is-valid env-name))
+          (error "Invalid conda environment specified: %s" env-name)
+        (conda-env-activate env-name)
+        (pyvenv-activate (conda-env-name-to-dir env-name))
+        )
+      )
+    )
+
+  (defun cadair-conda-deactivate ()
+    (interactive)
+    (conda-env-deactivate)
+    (pyvenv-deactivate)
+    )
+
+  (spacemacs/set-leader-keys "ae" 'cadair-conda-activate)
+  (spacemacs/set-leader-keys "ad" 'cadair-conda-deactivate)
+
   (setq python-shell-interpreter "ipython" python-shell-interpreter-args "--simple-prompt --pprint")
   (setq python-shell-completion-native-disabled-interpreters '("ipython"))
-  ;; TEST: Make TAB use company
-  ;;(global-set-key "\t" 'company-complete-common)
-  (setenv "SHELL" "/usr/bin/xonsh")
+
 
   ;; Enable editorconfig by default
   (editorconfig-mode 1)
 
+  ;; Reset shell
+  (setenv "SHELL" "/usr/bin/xonsh")
  )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -468,7 +507,7 @@ layers configuration. You are free to put any user code."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
-)
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
