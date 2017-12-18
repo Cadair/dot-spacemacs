@@ -4,7 +4,19 @@
 ;; This contains all the org mode config to break it out of the main spacemacs
 ;; file.
 
+;; Export
+;;;;;;;;;
 
+;; Latex Export Settings
+(setq org-latex-caption-above nil)
+
+(setq org-export-backends (quote (
+                                  md
+                                  odt
+                                  latex
+                                  confluence
+                                  taskjuggler
+                                 )))
 ;; Capture
 ;;;;;;;;;;
 
@@ -132,6 +144,8 @@
 
 ;; Agenda
 ;;;;;;;;;
+; Ignore taskjuggler tag in the agenda
+(setq org-agenda-hide-tags-regexp "taskjuggler_project")
 ;; Agenda clock report parameters
 (setq org-agenda-clockreport-parameter-plist
       (quote (:link t :maxlevel 5 :fileskip0 t :compact t :narrow 80)))
