@@ -456,7 +456,7 @@ layers configuration. You are free to put any user code."
   ;; Thanks to:
   ;; https://github.com/necaris/conda.el
 
-  (require 'conda)
+  (when (require 'conda nil :noerror)
 
   ;; if you want interactive shell support, include:
   ;; (conda-env-initialize-interactive-shells)
@@ -467,27 +467,28 @@ layers configuration. You are free to put any user code."
   (custom-set-variables
    '(conda-anaconda-home "/opt/miniconda"))
 
-  ;; spacemacs doesn't pick up the env unless we run pyvenv-activate
-  ;; So use the conda.el machinery to also run pyvenv-activate
-  (defun cadair-conda-activate (&optional name)
-    (interactive)
-    (let ((env-name (or name (conda--get-env-name))))
-      (if (not (conda-env-is-valid env-name))
-          (error "Invalid conda environment specified: %s" env-name)
-        (conda-env-activate env-name)
-        (pyvenv-activate (conda-env-name-to-dir env-name))
+    ;; spacemacs doesn't pick up the env unless we run pyvenv-activate
+    ;; So use the conda.el machinery to also run pyvenv-activate
+    (defun cadair-conda-activate (&optional name)
+      (interactive)
+      (let ((env-name (or name (conda--get-env-name))))
+        (if (not (conda-env-is-valid env-name))
+            (error "Invalid conda environment specified: %s" env-name)
+          (conda-env-activate env-name)
+          (pyvenv-activate (conda-env-name-to-dir env-name))
+          )
         )
       )
-    )
 
-  (defun cadair-conda-deactivate ()
-    (interactive)
-    (conda-env-deactivate)
-    (pyvenv-deactivate)
-    )
+    (defun cadair-conda-deactivate ()
+      (interactive)
+      (conda-env-deactivate)
+      (pyvenv-deactivate)
+      )
 
-  (spacemacs/set-leader-keys "ae" 'cadair-conda-activate)
-  (spacemacs/set-leader-keys "ad" 'cadair-conda-deactivate)
+    (spacemacs/set-leader-keys "ae" 'cadair-conda-activate)
+    (spacemacs/set-leader-keys "ad" 'cadair-conda-deactivate)
+    )
 
   (setq python-shell-interpreter "ipython" python-shell-interpreter-args "--simple-prompt --pprint")
   (setq python-shell-completion-native-disabled-interpreters '("ipython"))
@@ -507,13 +508,4 @@ layers configuration. You are free to put any user code."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
- '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
- '(org-done ((t (:weight normal :strike-through t))))
- '(org-headline-done ((((class color) (min-colors 16)) (:strike-through t)))))
+ '(conda-anaconda-home "/opt/miniconda")
