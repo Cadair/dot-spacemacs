@@ -16,7 +16,29 @@
                                   latex
                                   confluence
                                   taskjuggler
-                                 )))
+                                  )))
+
+;; Editing
+;;;;;;;;;;
+
+
+;; Links
+(setq cadair-default-gh-repo "sunpy/sunpy")
+
+(defun cadair-gh-open (link)
+  """Complete a link to a github issue / PR"""
+  (if (string-prefix-p "#" link)
+      (setq link2 (concat cadair-default-gh-repo link))
+    (setq link2 link)
+    )
+  (setq ghlink (concat "https://github.com/" (replace-regexp-in-string "#" "/issues/" link2)))
+  ;; (message ghlink)
+  (org-open-link-from-string ghlink)
+  )
+
+(org-add-link-type "gh" 'cadair-gh-open)
+
+
 ;; Capture
 ;;;;;;;;;;
 
