@@ -350,6 +350,10 @@ layers configuration. You are free to put any user code."
   ;; Bug fix for https://github.com/syl20bnr/spacemacs/issues/9608
   (require 'helm-bookmark)
 
+  ;; Set transparency of emacs window (active . inactive) where 0 is completely transparent.
+  (set-frame-parameter (selected-frame) 'alpha '(85 . 50))
+  (add-to-list 'default-frame-alist '(alpha . (85 . 50)))
+
   ;; Shortcut to start a terminal
   (spacemacs/set-leader-keys "at" 'ansi-term)
   ;; Use K and J to page up and page down
