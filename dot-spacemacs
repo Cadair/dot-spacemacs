@@ -67,7 +67,7 @@ This function should only modify configuration layer settings."
      yaml
      ;; markdown
      (markdown :variables markdown-live-preview-engine 'vmd)
-     latex
+     ;; latex
      html
      systemd
      rust  ;; for toml
