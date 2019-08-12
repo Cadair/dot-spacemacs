@@ -40,6 +40,14 @@
 
 (org-add-link-type "gh" 'cadair-gh-open)
 
+(defun cadair-jira-open (link)
+  """Complete a link to a jira ticket"""
+  (setq ghlink (concat "https://nso-atst.atlassian.net/browse/DCS-" link))
+  ;; (message ghlink)
+  (org-open-link-from-string ghlink)
+  )
+
+(org-add-link-type "DCS" 'cadair-jira-open)
 ;; (defun org-make-gh-link-description (link desc)
 ;;   (when (string-prefix-p "gh:" link)
 ;;     (concat "#" (nth 1 (split-string link "#")))
@@ -67,8 +75,8 @@
 
 ;;set priority range from A to C with default A
 (setq org-highest-priority ?A)
-(setq org-lowest-priority ?C)
-(setq org-default-priority ?A)
+(setq org-lowest-priority ?D)
+(setq org-default-priority ?C)
 
 ;;set colours for priorities
 (setq org-priority-faces '((?A . (:foreground "#F0DFAF" :weight bold))
@@ -79,6 +87,7 @@
 (defvar cadair-capture-file "~/Notebooks/refile.org")
 (setq org-default-notes-file cadair-capture-file)
 
+;; This seems to work for protocol setup: http://www.mediaonfire.com/blog/2017_07_21_org_protocol_firefox.html
 ;; Capture templates for: TODO tasks, Notes, appointments, phone calls, meetings, and org-protocol
 (setq org-capture-templates
       (quote (("t" "todo" entry (file cadair-capture-file)
@@ -187,28 +196,60 @@
 (setq org-agenda-compact-blocks nil)
 
 (defvar bh/hide-scheduled-and-waiting-next-tasks t)
+
+;; org-super-agenda
+;; (require 'org-super-agenda)
+;; (org-super-agenda-mode)
+;; (setq org-super-agenda-groups '(
+;;                                 (:name "Overdue"
+;;                                        :deadline past
+;;                                        :scheduled past)
+;;                                 (:name "Today"
+;;                                        :time-grid t
+;;                                        )
+;;                                 (:name "High Priority"
+;;                                        :priority "A"
+;;                                        )
+;;                                 ))
+
 ;; Custom agenda command definitions
+
 (setq org-agenda-custom-commands
       (quote (("N" "Notes" tags "NOTE"
               ((org-agenda-overriding-header "Notes")
                 (org-tags-match-list-sublevels t)))
-              ("h" "Habits" tags-todo "STYLE=\"habit\""
-              ((org-agenda-overriding-header "Habits")
-                (org-agenda-sorting-strategy
-                '(todo-state-down effort-up category-keep))))
-              (" " "Agenda"
+              (" " "Primary Agenda"
                 ((agenda "" (
-                             (org-agenda-span (quote week))
-                             (org-agenda-skip-scheduled-if-deadline-is-shown t)
+                             (org-agenda-span (quote day))
+                             (org-agenda-skip-scheduled-if-deadline-is-shown nil)
                              ))
                 (tags "REFILE"
                       ((org-agenda-overriding-header "Tasks to Refile")
                       (org-tags-match-list-sublevels nil)))
-                (tags-todo "-CANCELLED/!"
-                          ((org-agenda-overriding-header "Stuck Projects")
-                            (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+                ;; DKIST Projects
+                (tags-todo "dkist&activesprint&-HOLD-CANCELLED"
+                           ((org-agenda-overriding-header "Active Sprint Tasks")
+                            (org-tags-match-list-sublevels 'indented)
                             (org-agenda-sorting-strategy
-                            '(category-keep))))
+                             '(category-keep))))
+                (tags-todo "dkist&-HOLD-CANCELLED/!"
+                           ((org-agenda-overriding-header "DKIST Projects")
+                            (org-agenda-skip-function 'bh/skip-non-projects)
+                            (org-tags-match-list-sublevels 'indented)
+                            (org-agenda-sorting-strategy
+                             '(category-keep))))
+                ;; Priority Tasks
+                (tags-todo "+PRIORITY=\"A\"|+PRIORITY=\"B\""
+                           (
+                            (org-agenda-overriding-header (concat "Priority Tasks"))
+                            (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-tags-match-list-sublevels 'indented)
+                            (org-agenda-sorting-strategy
+                             '(priority-down))
+                            ))
+                ;; Waiting and Postponed
                 (tags-todo "-CANCELLED+WAITING|HOLD/!"
                            ((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
                                                                   (if bh/hide-scheduled-and-waiting-next-tasks
@@ -218,12 +259,13 @@
                             (org-tags-match-list-sublevels nil)
                             (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
                             (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)))
-                (tags-todo "-HOLD-CANCELLED/!"
-                          ((org-agenda-overriding-header "Projects")
-                            (org-agenda-skip-function 'bh/skip-non-projects)
-                            (org-tags-match-list-sublevels 'indented)
+                ;; Stuck
+                (tags-todo "-CANCELLED/!"
+                           ((org-agenda-overriding-header "Stuck Projects")
+                            (org-agenda-skip-function 'bh/skip-non-stuck-projects)
                             (org-agenda-sorting-strategy
-                            '(category-keep))))
+                             '(category-keep))))
+                ;; Project Next Tasks
                 (tags-todo "-CANCELLED/!NEXT"
                           ((org-agenda-overriding-header (concat "Project Next Tasks"
                                                                   (if bh/hide-scheduled-and-waiting-next-tasks
