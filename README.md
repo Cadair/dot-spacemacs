@@ -8,7 +8,7 @@ This is my spacemacs config to use it run the following in your home dir:
     ln ~/.config/spacemacs/emacsd.service ~/.config/systemd/user/emacsd.service
     systemctl enable --now --user emacsd.service
     
-    ln -s ~/.config/spacemacs/dot_spacemacs ~/.spacemacs
+    ln -s ~/.config/spacemacs/dot-spacemacs ~/.spacemacs
 
 ## Credit
 
