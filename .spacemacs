@@ -1,4 +1,4 @@
-;; -*- mode: emacs-lisp -*-
+;; -*- mode: emacs-lisp; lexical-binding: t -*-
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
@@ -34,15 +34,14 @@ This function should only modify configuration layer settings."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
-     ;; ----------------------------------------------------------------
-     ;; Example of useful layers you may want to use right away.
-     ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
-     ;; `M-m f e R' (Emacs style) to install them.
-     ;; ----------------------------------------------------------------
      ;; Tools
+     ;; restclient
      helm
-     auto-completion
-     better-defaults
+     (auto-completion :variables
+                      auto-completion-return-key-behavior 'complete
+                      auto-completion-tab-key-behavior 'cycle
+                      auto-completion-private-snippets-directory nil)
+     ;; better-defaults
      spell-checking
      syntax-checking
      version-control
@@ -58,36 +57,39 @@ This function should only modify configuration layer settings."
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom)
-     emacs-lisp
      (python :variables
+             python-backend 'lsp
              python-test-runner 'pytest)
-     nginx
+     emacs-lisp
+     nim
      ansible
      ipython-notebook
-     github
      yaml
-     markdown
+     ;; markdown
+     (markdown :variables markdown-live-preview-engine 'vmd)
      latex
      html
-     javascript
      systemd
-     php
      rust  ;; for toml
-     ;; javascript
-     ;; windows-scripts
-     ;; haskell
-     ;; csharp
-     ;; tmux
+     (javascript :variables javascript-backend 'lsp)
+     graphviz
+     ;; c-c++
 
      ;; random
      xkcd
+
+     lsp
+     dap
      )
 
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages then consider to create a layer, you can also put the
    ;; configuration in `dotspacemacs/config'.
-   dotspacemacs-additional-packages '(pkgbuild-mode
+   dotspacemacs-additional-packages '(
+                                      quelpa-use-package
+                                      (matrix-client :location (recipe :fetcher github :repo "jgkamat/matrix-client-el"))
+                                      pkgbuild-mode
                                       cl-generic
                                       rst
                                       editorconfig
@@ -95,8 +97,14 @@ This function should only modify configuration layer settings."
                                       org-caldav
                                       org-ref
                                       org-plus-contrib
+                                      (org-now :location (recipe :fetcher github :repo "alphapapa/org-now"))
+                                      org-super-agenda
                                       git-auto-commit-mode
-                                      conda)
+                                      conda
+                                      dash
+                                      real-auto-save
+                                      org-jira
+                                      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -223,30 +231,26 @@ It should only modify the values of Spacemacs settings."
                          spacemacs-light)
 
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
-   ;; `all-the-icons', `custom', `vim-powerline' and `vanilla'. The first three
-   ;; are spaceline themes. `vanilla' is default Emacs mode-line. `custom' is a
-   ;; user defined themes, refer to the DOCUMENTATION.org for more info on how
-   ;; to create your own spaceline theme. Value can be a symbol or list with\
-   ;; additional properties.
+   ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
+   ;; first three are spaceline themes. `doom' is the doom-emacs mode-line.
+   ;; `vanilla' is default Emacs mode-line. `custom' is a user defined themes,
+   ;; refer to the DOCUMENTATION.org for more info on how to create your own
+   ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
    dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.5)
 
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state t
-   ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
-   ;; size to make separators look not too crappy.
-   ;; dotspacemacs-default-font '("Fall Back"
-   ;;                             ;; :size 20
-   ;;                             :weight normal
-   ;;                             :width normal
-   ;;                             :powerline-scale 1.1)
-   dotspacemacs-default-font '("Inconsolata for Powerline"
-                               ;; :size 28
-                               :weight medium
-                               :width normal
-                               :powerline-scale 1.2)
-   ;; The leader key
+
+   ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
+   ;; quickly tweak the mode-line size to make separators look not too crappy.
+   dotspacemacs-default-font '("Source Code Pro"
+                               :size 16
+                               :weight normal
+                               :width normal)
+
+   ;; The leader key (default "SPC")
    dotspacemacs-leader-key "SPC"
 
    ;; The key used for Emacs commands `M-x' (after pressing on the leader key).
@@ -393,7 +397,9 @@ It should only modify the values of Spacemacs settings."
    ;; If non-nil show the color guide hint for transient state keys. (default t)
    dotspacemacs-show-transient-state-color-guide t
 
-   ;; If non-nil unicode symbols are displayed in the mode line. (default t)
+   ;; If non-nil unicode symbols are displayed in the mode line.
+   ;; If you use Emacs as a daemon and wants unicode characters only in GUI set
+   ;; the value to quoted `display-graphic-p'. (default t)
    dotspacemacs-mode-line-unicode-symbols t
 
    ;; If non-nil smooth scrolling (native-scrolling) is enabled. Smooth
@@ -438,9 +444,16 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil)
    dotspacemacs-enable-server nil
 
+   ;; Set the emacs server socket location.
+   ;; If nil, uses whatever the Emacs default is, otherwise a directory path
+   ;; like \"~/.emacs.d/server\". It has no effect if
+   ;; `dotspacemacs-enable-server' is nil.
+   ;; (default nil)
+   dotspacemacs-server-socket-dir nil
+
    ;; If non-nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
-   dotspacemacs-persistent-server nil
+   dotspacemacs-persistent-server t
 
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `rg', `ag', `pt', `ack' and `grep'.
@@ -492,14 +505,33 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
+  (ido-mode -1)
+
+  (if (string= "dolgoch" (system-name))
+      (setq-default dotspacemacs-default-font
+                    '("Source Code Pro"
+                      :size 14
+                      :weight normal
+                      :width normal)))
   )
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
  This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
-  ;; Bug fix for https://github.com/syl20bnr/spacemacs/issues/9608
-  (require 'helm-bookmark)
+  ;; General Spacemacs Tweaks
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (spacemacs/toggle-indent-guide-globally-on)
+  (require 'dap-node)
+
+  ;; (with-eval-after-load "ispell"
+  ;;   (setq ispell-program-name "hunspell")
+  ;;   ;; ispell-set-spellchecker-params has to be called
+  ;;   ;; before ispell-hunspell-add-multi-dic will work
+  ;;   (ispell-set-spellchecker-params)
+  ;;   ;; (ispell-hunspell-add-multi-dic "en_GB")
+  ;;   (setq ispell-dictionary "en_GB"))
+
 
   ;; Set transparency of emacs window (active . inactive) where 0 is completely transparent.
   (set-frame-parameter (selected-frame) 'alpha '(90 . 70))
@@ -510,6 +542,7 @@ layers configuration. You are free to put any user code."
   ;; Use K and J to page up and page down
   (define-key evil-normal-state-map (kbd "K") 'scroll-down-command )
   (define-key evil-normal-state-map (kbd "J") 'scroll-up-command )
+  (define-key evil-normal-state-map (kbd ",,") 'spacemacs/evil-search-clear-highlight )
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
 
   ;; Set default notebook port to be my background jupyter server
@@ -525,12 +558,26 @@ layers configuration. You are free to put any user code."
   ;; git-auto-commit
   (setq gac-automatically-push-p t)
 
+  ;; dewrap
+  (defun remove-newlines-in-region ()
+    "Removes all newlines in the region."
+    (interactive)
+    (save-restriction
+      (narrow-to-region (point) (mark))
+      (goto-char (point-min))
+      (while (search-forward "\n" nil t) (replace-match " " nil t))))
+
+
+  ;; (use-package matrix-client
+  ;;   :quelpa ((matrix-client :fetcher github :repo "jgkamat/matrix-client-el"
+  ;;                           :files (:defaults "logo.png" "matrix-client-standalone.el.sh"))))
+
   ;; PythonTeX Polymode
   ;;;;;;;;;;;;;;;;;;;;;
-  (setq load-path
-        (append '("~/.config/spacemacs/.polymode/")
-                load-path))
-  (require 'poly-pythontex)
+  ;; (setq load-path
+  ;;       (append '("~/.config/spacemacs/.polymode/")
+  ;;               load-path))
+  ;; (require 'poly-pythontex)
 
   ;; Disable automatic enable
   ;; (add-to-list 'auto-mode-alist '("\\.tex" . poly-pythontex-mode))
@@ -549,15 +596,18 @@ layers configuration. You are free to put any user code."
   (spacemacs/set-leader-keys-for-major-mode 'ein:notebook-multilang-mode "r" 'ein:notebook-restart-kernel-command)
   (spacemacs/set-leader-keys-for-major-mode 'ein:notebook-multilang-mode "e" 'ein:worksheet-execute-all-cell)
 
+  ;; Xonsh mode
+  ;;;;;;;;;;;;;
+
+  (define-derived-mode xonsh-mode python-mode "Xonsh Mode"
+    "A mode for .xsh files.")
+
+  (add-to-list 'auto-mode-alist '("\\.xsh\\'" . xonsh-mode))
+  (add-to-list 'auto-mode-alist '("\\.xonshrc\\'" . xonsh-mode))
 
   ;;;;;;;;;;;;;;
   ;; Org Mode ;;
   ;;;;;;;;;;;;;;
-  (setq load-path
-        (append '("~/.config/spacemacs/ox-ipynb/")
-                load-path))
-  (require 'ox-ipynb)
-
 
   ;; Global Key Bindings
   ;;;;;;;;;;;;;;;;;;;;;;
@@ -570,6 +620,30 @@ layers configuration. You are free to put any user code."
   (spacemacs/set-leader-keys "oh" 'org-insert-todo-heading)
   (spacemacs/set-leader-keys "os" 'org-insert-todo-subheading)
   (spacemacs/set-leader-keys "oc" 'org-capture)
+
+  (setq load-path
+        (append '("~/.config/spacemacs/ox-ipynb/")
+                load-path))
+  (require 'ox-ipynb)
+  (require 'org-depend)
+  (setq jiralib-url "https://nso-atst.atlassian.net")
+
+  (defun org-toc ()
+    (interactive)
+    (let ((headings (delq nil (loop for f in (f-entries "." (lambda (f) (f-ext? f "org")) t)
+                                    append
+                                    (with-current-buffer (find-file-noselect f)
+                                      (org-map-entries
+                                       (lambda ()
+                                         (when (> 2 (car (org-heading-components)))
+                                           (cons f (nth 4 (org-heading-components)))))))))))
+      (switch-to-buffer (get-buffer-create "*toc*"))
+      (erase-buffer)
+      (org-mode)
+      (loop for (file . heading) in headings
+            do
+            (insert (format "* %s\n" heading)))))
+
   ;; Define a key in evil normal mode when org-mode
   (evil-define-key 'normal org-mode-map (kbd "t") 'org-todo)
 
@@ -579,13 +653,25 @@ layers configuration. You are free to put any user code."
     (require 'org-protocol)
     (require 'org-habit)
 
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
     (setq org-startup-truncated nil)
     (load-file (expand-file-name "~/.config/spacemacs/bh-org.el"))
     (load-file (expand-file-name "~/.config/spacemacs/cadair-org-mode.el"))
+    ;; (load-file (expand-file-name "~/.config/spacemacs/ox-confluence.el"))
 
+    (require 'ox-confluence)
     ;; End Org Mode Section
     )
+
+  ;; auto-save all org files every 10s
+  ;; (require 'real-auto-save)
+  ;; (add-hook 'org-mode-hook 'real-auto-save-mode)
+
+  ;; org-now config
+  (spacemacs/set-leader-keys "on" 'org-now)
+  (spacemacs/set-leader-keys "ow" 'org-now-refile-to-now)
+  (spacemacs/set-leader-keys "oW" 'org-now-refile-to-previous-location)
 
   ;; ORG MODE CALENDAR
   ;;;;;;;;;;;;;;;;;;;;
@@ -653,19 +739,82 @@ layers configuration. You are free to put any user code."
     (spacemacs/set-leader-keys "ad" 'cadair-conda-deactivate)
     )
 
-  (setq python-shell-interpreter "ipython" python-shell-interpreter-args "--simple-prompt --pprint")
-  (setq python-shell-completion-native-disabled-interpreters '("ipython"))
-
+  ;; (setq python-shell-interpreter "ipython" python-shell-interpreter-args "--simple-prompt --pprint")
+  ;; (setq python-shell-completion-native-disabled-interpreters '("ipython"))
 
   ;; Enable editorconfig by default
   (editorconfig-mode 1)
 
   ;; Python tweaks and stuff
   ;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;; lsp config
+  (custom-set-variables '(lsp-pyls-configuration-sources ["flake8"]))
+  (custom-set-variables '(lsp-pyls-plugins-pyflakes-enabled t))
+  (custom-set-variables '(lsp-pyls-plugins-pylint-enabled t))
+  (custom-set-variables '(lsp-clients-python-library-directories '("/usr/" "/home/stuart/.virtualenvs/")))
+  ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-enabled f))
+  ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-convention "numpy"))
+  ;; This isn't working for some reason. Can't use until it does lol.
+  ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-ignore ["D200"]))
+
+  (defun cadair/run-restart-repl ()
+    "Get a new repl running"
+    (if (python-shell-get-process)
+        (kill-buffer (python-shell-get-buffer))
+      )
+    (let ((shell-process
+           (or (python-shell-get-process)
+               ;; `run-python' has different return values and different
+               ;; errors in different emacs versions. In 24.4, it throws an
+               ;; error when the process didn't start, but in 25.1 it
+               ;; doesn't throw an error, so we demote errors here and
+               ;; check the process later
+               (with-demoted-errors "Error: %S"
+                 ;; in Emacs 24.5 and 24.4, `run-python' doesn't return the
+                 ;; shell process
+                 (call-interactively #'run-python)
+                 (python-shell-get-process)))))
+      (unless shell-process
+        (error "Failed to start python shell properly"))
+      )
+    )
+
+  (defun cadair/run-in-repl (arg)
+    "Run a python buffer in a new ipython repl"
+    (interactive "P")
+    (cadair/run-restart-repl)
+    (spacemacs/python-shell-send-buffer)
+    )
+
+  (defun cadair/run-in-repl-switch (arg)
+    "Run a python buffer in a new ipython repl"
+    (interactive "P")
+    (cadair/run-restart-repl)
+    (spacemacs/python-shell-send-buffer-switch)
+    )
+
+  (spacemacs/set-leader-keys-for-major-mode 'python-mode
+    "e" 'cadair/run-in-repl
+    "E" 'cadair/run-in-repl-switch)
+
+  ;; (setq flycheck-python-flake8-executable "/opt/miniconda/bin/python")
   (defsubst python-in-string/comment ()
     "Return non-nil if point is in a Python literal (a comment or string)."
     ;; We don't need to save the match data.
     (nth 8 (syntax-ppss)))
+
+  (defun cadair/pytest-one-remote (arg)
+    (interactive "P")
+    (pytest-one "--remote-data=any -s"))
+
+  (defun cadair/pytest-module-remote (arg)
+    (interactive "P")
+    (pytest-module "--remote-data=any -s"))
+
+  (spacemacs/set-leader-keys-for-major-mode 'python-mode
+    "trt" 'cadair/pytest-one-remote
+    "trb" 'cadair/pytest-module-remote)
 
   ;; Add to __all__
   (defun python-add-to-all ()
@@ -698,8 +847,3 @@ layers configuration. You are free to put any user code."
   (setenv "SHELL" "/usr/bin/xonsh")
   (setq explicit-shell-file-name "/bin/xonsh")
  )
-
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
-(custom-set-variables
-)
