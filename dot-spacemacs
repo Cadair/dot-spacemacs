@@ -847,3 +847,29 @@ layers configuration. You are free to put any user code."
   (setenv "SHELL" "/usr/bin/xonsh")
   (setq explicit-shell-file-name "/bin/xonsh")
  )
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(conda-anaconda-home "/opt/miniconda")
+ '(lsp-clients-python-library-directories (quote ("/usr/" "/home/stuart/.virtualenvs/")))
+ '(lsp-pyls-configuration-sources ["flake8"])
+ '(lsp-pyls-plugins-pyflakes-enabled t)
+ '(lsp-pyls-plugins-pylint-enabled t)
+ '(org-agenda-files
+   (quote
+    ("~/Notebooks/Aperio.org" "~/Notebooks/DKIST.org" "~/Notebooks/Notes.org" "~/Notebooks/SunPy.org" "~/Notebooks/ToDo.org" "~/Notebooks/Travel_List.org" "~/Notebooks/now.org" "~/Notebooks/refile.org" "~/Notebooks/tywyn_network.org" "~/Notebooks/usertools_overview.org"))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(org-done ((t (:weight normal :strike-through t))))
+ '(org-headline-done ((((class color) (min-colors 16)) (:strike-through t)))))
+)
