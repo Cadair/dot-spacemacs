@@ -59,6 +59,7 @@ This function should only modify configuration layer settings."
             shell-default-position 'bottom)
      (python :variables
              python-backend 'lsp
+             python-lsp-server 'mspyls
              python-test-runner 'pytest)
      emacs-lisp
      nim
