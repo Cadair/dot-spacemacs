@@ -105,6 +105,7 @@ This function should only modify configuration layer settings."
                                       dash
                                       real-auto-save
                                       org-jira
+                                      pretty-mode
                                       )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -246,8 +247,8 @@ It should only modify the values of Spacemacs settings."
 
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 16
+   dotspacemacs-default-font '("Fira Code"
+                               :size 14
                                :weight normal
                                :width normal)
 
@@ -508,12 +509,72 @@ It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (ido-mode -1)
 
-  (if (string= "dolgoch" (system-name))
-      (setq-default dotspacemacs-default-font
-                    '("Source Code Pro"
-                      :size 14
-                      :weight normal
-                      :width normal)))
+  (defun fira-code-mode--make-alist (list)
+    "Generate prettify-symbols alist from LIST."
+    (let ((idx -1))
+      (mapcar
+       (lambda (s)
+         (setq idx (1+ idx))
+         (let* ((code (+ #Xe100 idx))
+                (width (string-width s))
+                (prefix ())
+                (suffix '(?\s (Br . Br)))
+                (n 1))
+           (while (< n width)
+             (setq prefix (append prefix '(?\s (Br . Bl))))
+             (setq n (1+ n)))
+           (cons s (append prefix suffix (list (decode-char 'ucs code))))))
+       list)))
+
+  (defconst fira-code-mode--ligatures
+    '("www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\"
+      "{-" "[]" "::" ":::" ":=" "!!" "!=" "!==" "-}"
+      "--" "---" "-->" "->" "->>" "-<" "-<<" "-~"
+      "#{" "#[" "##" "###" "####" "#(" "#?" "#_" "#_("
+      ".-" ".=" ".." "..<" "..." "?=" "??" ";;" "/*"
+      "/**" "/=" "/==" "/>" "//" "///" "&&" "||" "||="
+      "|=" "|>" "^=" "$>" "++" "+++" "+>" "=:=" "=="
+      "===" "==>" "=>" "=>>" "<=" "=<<" "=/=" ">-" ">="
+      ">=>" ">>" ">>-" ">>=" ">>>" "<*" "<*>" "<|" "<|>"
+      "<$" "<$>" "<!--" "<-" "<--" "<->" "<+" "<+>" "<="
+      "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<" "<~"
+      "<~~" "</" "</>" "~@" "~-" "~=" "~>" "~~" "~~>" "%%"
+      "x" ":" "+" "+" "*"))
+
+  (defvar fira-code-mode--old-prettify-alist)
+
+  (defun fira-code-mode--enable ()
+    "Enable Fira Code ligatures in current buffer."
+    (setq-local fira-code-mode--old-prettify-alist prettify-symbols-alist)
+    (setq-local prettify-symbols-alist (append (fira-code-mode--make-alist fira-code-mode--ligatures) fira-code-mode--old-prettify-alist))
+    (prettify-symbols-mode t))
+
+  (defun fira-code-mode--disable ()
+    "Disable Fira Code ligatures in current buffer."
+    (setq-local prettify-symbols-alist fira-code-mode--old-prettify-alist)
+    (prettify-symbols-mode -1))
+
+  (define-minor-mode fira-code-mode
+    "Fira Code ligatures minor mode"
+    :normal " Fira Code"
+    (setq-local prettify-symbols-unprettify-at-point 'right-edge)
+    (if fira-code-mode
+        (fira-code-mode--enable)
+      (fira-code-mode--disable)))
+
+  (defun fira-code-mode--setup ()
+    "Setup Fira Code Symbols"
+    (set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol"))
+
+  (provide 'fira-code-mode)
+  (fira-code-mode--enable)
+
+  ;; (if (string= "dolgoch" (system-name))
+  ;;     (setq-default dotspacemacs-default-font
+  ;;                   '("Fira Code"
+  ;;                     :size 14
+  ;;                     :weight normal
+  ;;                     :width normal)))
   )
 
 (defun dotspacemacs/user-config ()
@@ -709,14 +770,14 @@ layers configuration. You are free to put any user code."
 
   (when (require 'conda nil :noerror)
 
-  ;; if you want interactive shell support, include:
-  ;; (conda-env-initialize-interactive-shells)
+    ;; if you want interactive shell support, include:
+    ;; (conda-env-initialize-interactive-shells)
 
-  ;; if you want eshell support, include:
-  ;; (conda-env-initialize-eshell)
+    ;; if you want eshell support, include:
+    ;; (conda-env-initialize-eshell)
 
-  (custom-set-variables
-   '(conda-anaconda-home "/opt/miniconda"))
+    (custom-set-variables
+     '(conda-anaconda-home "/opt/miniconda"))
 
     ;; spacemacs doesn't pick up the env unless we run pyvenv-activate
     ;; So use the conda.el machinery to also run pyvenv-activate
@@ -848,33 +909,33 @@ layers configuration. You are free to put any user code."
   ;; Reset shell
   (setenv "SHELL" "/usr/bin/xonsh")
   (setq explicit-shell-file-name "/bin/xonsh")
- )
+  )
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
 Emacs customize menu instead.
 This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(conda-anaconda-home "/opt/miniconda")
- '(lsp-clients-python-library-directories (quote ("/usr/" "/home/stuart/.virtualenvs/")))
- '(lsp-pyls-configuration-sources ["flake8"])
- '(lsp-pyls-plugins-pyflakes-enabled t)
- '(lsp-pyls-plugins-pylint-enabled t)
- '(org-agenda-files
-   (quote
-    ("~/Notebooks/Aperio.org" "~/Notebooks/DKIST.org" "~/Notebooks/Notes.org" "~/Notebooks/SunPy.org" "~/Notebooks/ToDo.org" "~/Notebooks/Travel_List.org" "~/Notebooks/now.org" "~/Notebooks/refile.org" "~/Notebooks/tywyn_network.org" "~/Notebooks/usertools_overview.org")))
- '(package-selected-packages
-   (quote
-    (tide typescript-mode import-js grizzl add-node-modules-path yasnippet-snippets yapfify yaml-mode xterm-color xkcd ws-butler writeroom-mode winum which-key web-mode web-beautify volatile-highlights vmd-mode vi-tilde-fringe uuidgen treemacs-projectile treemacs-evil toml-mode toc-org tagedit systemd symon symbol-overlay string-inflection spaceline-all-the-icons smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs real-auto-save ranger rainbow-delimiters racer quelpa-use-package pytest pyenv-mode py-isort pug-mode prettier-js popwin pkgbuild-mode pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox ox-gfm overseer orgit org-super-agenda org-ref org-re-reveal org-projectile org-present org-pomodoro org-now org-mime org-download org-cliplink org-caldav org-bullets org-brain open-junk-file ob-ipython nodejs-repl nim-mode nameless multi-term move-text monokai-theme mmm-mode matrix-client markdown-toc magit-svn magit-gitflow macrostep lsp-ui lsp-treemacs lsp-python-ms lorem-ipsum livid-mode live-py-mode link-hint json-navigator json-mode js2-refactor js-doc jinja2-mode indent-guide importmagic impatient-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-org-rifle helm-org helm-mode-manager helm-make helm-lsp helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag graphviz-dot-mode google-translate golden-ratio gnuplot gitignore-templates github-search github-clone gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ git-auto-commit-mode gist gh-md fuzzy forge font-lock+ flyspell-correct-helm flycheck-rust flycheck-pos-tip flycheck-package flycheck-nim flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav ein editorconfig dumb-jump dotenv-mode doom-modeline diminish diff-hl devdocs define-word dap-mode cython-mode conda company-web company-tern company-statistics company-lsp company-ansible company-anaconda column-enforce-mode clean-aindent-mode centered-cursor-mode cargo browse-at-remote blacken auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile ansible-doc ansible aggressive-indent ace-link ace-jump-helm-line ac-ispell))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(org-done ((t (:weight normal :strike-through t))))
- '(org-headline-done ((((class color) (min-colors 16)) (:strike-through t)))))
-)
+  (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(conda-anaconda-home "/opt/miniconda")
+   '(lsp-clients-python-library-directories (quote ("/usr/" "/home/stuart/.virtualenvs/")))
+   '(lsp-pyls-configuration-sources ["flake8"])
+   '(lsp-pyls-plugins-pyflakes-enabled t)
+   '(lsp-pyls-plugins-pylint-enabled t)
+   '(org-agenda-files
+     (quote
+      ("~/Notebooks/Aperio.org" "~/Notebooks/DKIST.org" "~/Notebooks/Notes.org" "~/Notebooks/SunPy.org" "~/Notebooks/ToDo.org" "~/Notebooks/Travel_List.org" "~/Notebooks/now.org" "~/Notebooks/refile.org" "~/Notebooks/tywyn_network.org" "~/Notebooks/usertools_overview.org")))
+   '(package-selected-packages
+     (quote
+      (pretty-mode tide typescript-mode import-js grizzl add-node-modules-path yasnippet-snippets yapfify yaml-mode xterm-color xkcd ws-butler writeroom-mode winum which-key web-mode web-beautify volatile-highlights vmd-mode vi-tilde-fringe uuidgen treemacs-projectile treemacs-evil toml-mode toc-org tagedit systemd symon symbol-overlay string-inflection spaceline-all-the-icons smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs real-auto-save ranger rainbow-delimiters racer quelpa-use-package pytest pyenv-mode py-isort pug-mode prettier-js popwin pkgbuild-mode pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox ox-gfm overseer orgit org-super-agenda org-ref org-re-reveal org-projectile org-present org-pomodoro org-now org-mime org-download org-cliplink org-caldav org-bullets org-brain open-junk-file ob-ipython nodejs-repl nim-mode nameless multi-term move-text monokai-theme mmm-mode matrix-client markdown-toc magit-svn magit-gitflow macrostep lsp-ui lsp-treemacs lsp-python-ms lorem-ipsum livid-mode live-py-mode link-hint json-navigator json-mode js2-refactor js-doc jinja2-mode indent-guide importmagic impatient-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-org-rifle helm-org helm-mode-manager helm-make helm-lsp helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag graphviz-dot-mode google-translate golden-ratio gnuplot gitignore-templates github-search github-clone gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ git-auto-commit-mode gist gh-md fuzzy forge font-lock+ flyspell-correct-helm flycheck-rust flycheck-pos-tip flycheck-package flycheck-nim flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav ein editorconfig dumb-jump dotenv-mode doom-modeline diminish diff-hl devdocs define-word dap-mode cython-mode conda company-web company-tern company-statistics company-lsp company-ansible company-anaconda column-enforce-mode clean-aindent-mode centered-cursor-mode cargo browse-at-remote blacken auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile ansible-doc ansible aggressive-indent ace-link ace-jump-helm-line ac-ispell))))
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(org-done ((t (:weight normal :strike-through t))))
+   '(org-headline-done ((((class color) (min-colors 16)) (:strike-through t)))))
+  )
