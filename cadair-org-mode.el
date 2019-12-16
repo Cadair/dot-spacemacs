@@ -218,7 +218,7 @@
       (quote (("N" "Notes" tags "NOTE"
               ((org-agenda-overriding-header "Notes")
                 (org-tags-match-list-sublevels t)))
-              (" " "Primary Agenda"
+              ("p" "Primary Agenda"
                 ((agenda "" (
                              (org-agenda-span (quote day))
                              (org-agenda-skip-scheduled-if-deadline-is-shown nil)
