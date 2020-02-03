@@ -548,6 +548,12 @@ layers configuration. You are free to put any user code."
 
   ;; Shortcut to start a terminal
   (spacemacs/set-leader-keys "at" 'ansi-term)
+  (defun cadair-cistern ()
+    (interactive)
+    (ansi-term "/home/stuart/.local/bin/cistern")
+    )
+
+  (spacemacs/set-leader-keys "ci" 'cadair-cistern )
   ;; Use K and J to page up and page down
   (define-key evil-normal-state-map (kbd "K") 'scroll-down-command )
   (define-key evil-normal-state-map (kbd "J") 'scroll-up-command )
