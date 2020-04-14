@@ -33,7 +33,7 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(typescript
+   '(
      ;; Tools
      ;; restclient
      helm
@@ -60,8 +60,9 @@ This function should only modify configuration layer settings."
      (python :variables
              python-backend 'lsp
              python-lsp-server 'mspyls
-             python-lsp-git-root "~/Git/python-language-server/"
+             ;; python-lsp-git-root "~/Git/python-language-server/"
              python-test-runner 'pytest)
+     typescript
      emacs-lisp
      nim
      ansible
@@ -107,6 +108,7 @@ This function should only modify configuration layer settings."
                                       org-jira
                                       scad-mode
                                       scad-preview
+                                      ox-reveal
                                       )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -513,7 +515,7 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-  (ido-mode -1)
+  ;; (ido-mode -1)
   (setenv "DOTNET_SYSTEM_GLOBALIZATION_INVARIANT" "1")
   ;; (if (string= "dolgoch" (system-name))
   ;;     (setq-default dotspacemacs-default-font
@@ -638,6 +640,7 @@ layers configuration. You are free to put any user code."
                 load-path))
   (require 'ox-ipynb)
   (require 'org-depend)
+  (require 'ox-reveal)
   (setq jiralib-url "https://nso-atst.atlassian.net")
 
   (defun org-toc ()
@@ -762,10 +765,15 @@ layers configuration. You are free to put any user code."
 
   ;; lsp config
   (custom-set-variables '(lsp-pyls-configuration-sources ["flake8"]))
-  (custom-set-variables '(lsp-pyls-plugins-pyflakes-enabled t))
-  (custom-set-variables '(lsp-pyls-plugins-pylint-enabled t))
-  (custom-set-variables '(lsp-clients-python-library-directories '("/usr/" "/home/stuart/.virtualenvs/")))
-  ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-enabled f))
+  (custom-set-variables '(lsp-pyls-plugins-pyflakes-enabled nil))
+  (custom-set-variables '(lsp-pyls-plugins-pylint-enabled nil))
+  (custom-set-variables '(lsp-pyls-plugins-pylint-args ["--disable=W,R"]))
+  (custom-set-variables '(lsp-pyls-plugins-flake8-enabled t))
+  (custom-set-variables '(lsp-pyls-plugins-pyls_mypy-enabled t))
+  (custom-set-variables '(lsp-pyls-plugins-flake8-ignore ["D1"]))
+  ;; (custom-set-variables '(lsp-pyls-plugins-flake8-select ["E", "W"]))
+  ;; (custom-set-variables '(lsp-clients-python-library-directories '("/usr/" "/home/stuart/.virtualenvs/")))
+  ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-enabled nil))
   ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-convention "numpy"))
   ;; This isn't working for some reason. Can't use until it does lol.
   ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-ignore ["D200"]))
