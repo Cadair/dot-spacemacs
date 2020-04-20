@@ -764,6 +764,7 @@ layers configuration. You are free to put any user code."
   ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   ;; lsp config
+  (custom-set-variables '(lsp-clients-python-library-directories '("/usr/" "/home/stuart/.virtualenvs/")))
   (custom-set-variables '(lsp-pyls-configuration-sources ["flake8"]))
   (custom-set-variables '(lsp-pyls-plugins-pyflakes-enabled nil))
   (custom-set-variables '(lsp-pyls-plugins-pylint-enabled nil))
@@ -772,7 +773,6 @@ layers configuration. You are free to put any user code."
   (custom-set-variables '(lsp-pyls-plugins-pyls_mypy-enabled t))
   (custom-set-variables '(lsp-pyls-plugins-flake8-ignore ["D1"]))
   ;; (custom-set-variables '(lsp-pyls-plugins-flake8-select ["E", "W"]))
-  ;; (custom-set-variables '(lsp-clients-python-library-directories '("/usr/" "/home/stuart/.virtualenvs/")))
   ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-enabled nil))
   ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-convention "numpy"))
   ;; This isn't working for some reason. Can't use until it does lol.
@@ -878,10 +878,6 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(conda-anaconda-home "/opt/miniconda")
- '(lsp-clients-python-library-directories (quote ("/usr/" "/home/stuart/.virtualenvs/")))
- '(lsp-pyls-configuration-sources ["flake8"])
- '(lsp-pyls-plugins-pyflakes-enabled t)
- '(lsp-pyls-plugins-pylint-enabled t)
  '(org-agenda-files
    (quote
     ("~/Notebooks/Aperio.org" "~/Notebooks/DKIST.org" "~/Notebooks/Notes.org" "~/Notebooks/SunPy.org" "~/Notebooks/ToDo.org" "~/Notebooks/Travel_List.org" "~/Notebooks/now.org" "~/Notebooks/refile.org" "~/Notebooks/tywyn_network.org" "~/Notebooks/usertools_overview.org")))
