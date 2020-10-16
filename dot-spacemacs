@@ -53,6 +53,8 @@ This function should only modify configuration layer settings."
      ;; Languages
      (org :variables
           org-enable-github-support t
+          org-enable-jira-support t
+          jiralib-url "https://nso.atlassian.net"
           org-enable-reveal-js-support t)
      (shell :variables
             shell-default-height 30
@@ -105,10 +107,10 @@ This function should only modify configuration layer settings."
                                       conda
                                       dash
                                       real-auto-save
-                                      org-jira
                                       scad-mode
                                       scad-preview
                                       ox-reveal
+                                      secretaria
                                       )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -643,7 +645,6 @@ layers configuration. You are free to put any user code."
   (require 'ox-ipynb)
   (require 'org-depend)
   (require 'ox-reveal)
-  (setq jiralib-url "https://nso-atst.atlassian.net")
 
   (defun org-toc ()
     (interactive)
@@ -680,35 +681,6 @@ layers configuration. You are free to put any user code."
     (require 'ox-confluence)
     ;; End Org Mode Section
     )
-
-  ;; auto-save all org files every 10s
-  ;; (require 'real-auto-save)
-  ;; (add-hook 'org-mode-hook 'real-auto-save-mode)
-
-  ;; org-now config
-  (spacemacs/set-leader-keys "on" 'org-now)
-  (spacemacs/set-leader-keys "ow" 'org-now-refile-to-now)
-  (spacemacs/set-leader-keys "oW" 'org-now-refile-to-previous-location)
-
-  ;; ORG MODE CALENDAR
-  ;;;;;;;;;;;;;;;;;;;;
-  (require 'org-caldav)
-
-  ;; The CalDAV URL with your full and primary email address at the end.
-  (setq org-caldav-url "https://apps.kolabnow.com/calendars/stuart%40cadair.com")
-
-  ;; The name of your calendar, typically "Calendar" or similar
-  (setq org-caldav-calendar-id "26ad9118-3d38-4676-9d31-cb8f09d9b730")
-
-  ;; Local file that gets events from the server
-  (setq org-caldav-inbox "~/Notebooks/calendar.org")
-
-  ;; List of your org files here
-  (setq org-caldav-files org-agenda-files)
-
-  ;; Please make sure to set your correct timezone here
-  (setq org-icalendar-timezone "Europe/London")
-  (setq org-icalendar-date-time-format ";TZID=%Z:%Y%m%dT%H%M%S")
 
   ;; GPG Encryption
   ;;;;;;;;;;;;;;;;;
@@ -881,12 +853,20 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(conda-anaconda-home "/opt/miniconda")
+ '(evil-want-Y-yank-to-eol nil)
+ '(lsp-clients-python-library-directories '("/usr/" "/home/stuart/.virtualenvs/"))
+ '(lsp-pyls-configuration-sources ["flake8"])
+ '(lsp-pyls-plugins-mccable-enabled nil)
+ '(lsp-pyls-plugins-pycodestyle-enabled t)
+ '(lsp-pyls-plugins-pyflakes-enabled nil)
+ '(lsp-pyls-plugins-pylint-args ["--disable=R"])
+ '(lsp-pyls-plugins-pylint-enabled t)
+ '(lsp-pyls-plugins-pyls_mypy-enabled t)
+ '(lsp-pyls-plugins-pyls_mypy-live_mode nil)
  '(org-agenda-files
-   (quote
-    ("~/Notebooks/Aperio.org" "~/Notebooks/DKIST.org" "~/Notebooks/Notes.org" "~/Notebooks/SunPy.org" "~/Notebooks/ToDo.org" "~/Notebooks/Travel_List.org" "~/Notebooks/now.org" "~/Notebooks/refile.org" "~/Notebooks/tywyn_network.org" "~/Notebooks/usertools_overview.org")))
+   '("~/Notebooks/Aperio.org" "~/Notebooks/DKIST.org" "~/Notebooks/Notes.org" "~/Notebooks/SunPy.org" "~/Notebooks/ToDo.org" "~/Notebooks/Travel_List.org" "~/Notebooks/calendar.org" "~/Notebooks/now.org" "~/Notebooks/refile.org" "~/Notebooks/tywyn_network.org" "~/Notebooks/usertools_overview.org" "~/Notebooks/nso_jira/DCS.org"))
  '(package-selected-packages
-   (quote
-    (tide typescript-mode import-js grizzl add-node-modules-path yasnippet-snippets yapfify yaml-mode xterm-color xkcd ws-butler writeroom-mode winum which-key web-mode web-beautify volatile-highlights vmd-mode vi-tilde-fringe uuidgen treemacs-projectile treemacs-evil toml-mode toc-org tagedit systemd symon symbol-overlay string-inflection spaceline-all-the-icons smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs real-auto-save ranger rainbow-delimiters racer quelpa-use-package pytest pyenv-mode py-isort pug-mode prettier-js popwin pkgbuild-mode pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox ox-gfm overseer orgit org-super-agenda org-ref org-re-reveal org-projectile org-present org-pomodoro org-now org-mime org-download org-cliplink org-caldav org-brain open-junk-file ob-ipython nodejs-repl nim-mode nameless multi-term move-text monokai-theme mmm-mode markdown-toc magit-svn magit-gitflow macrostep lsp-ui lsp-treemacs lsp-python-ms lorem-ipsum livid-mode live-py-mode link-hint json-navigator json-mode js2-refactor js-doc jinja2-mode indent-guide importmagic impatient-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-org-rifle helm-org helm-mode-manager helm-make helm-lsp helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag graphviz-dot-mode google-translate golden-ratio gnuplot gitignore-templates github-search github-clone gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ git-auto-commit-mode gist gh-md fuzzy forge font-lock+ flyspell-correct-helm flycheck-rust flycheck-pos-tip flycheck-package flycheck-nim flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav ein editorconfig dumb-jump dotenv-mode doom-modeline diminish diff-hl devdocs define-word dap-mode cython-mode conda company-web company-tern company-statistics company-lsp company-ansible company-anaconda column-enforce-mode clean-aindent-mode centered-cursor-mode cargo browse-at-remote blacken auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile ansible-doc ansible aggressive-indent ace-link ace-jump-helm-line ac-ispell))))
+   '(ox-jira org-jira tide typescript-mode import-js grizzl add-node-modules-path yasnippet-snippets yapfify yaml-mode xterm-color xkcd ws-butler writeroom-mode winum which-key web-mode web-beautify volatile-highlights vmd-mode vi-tilde-fringe uuidgen treemacs-projectile treemacs-evil toml-mode toc-org tagedit systemd symon symbol-overlay string-inflection spaceline-all-the-icons smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs real-auto-save ranger rainbow-delimiters racer quelpa-use-package pytest pyenv-mode py-isort pug-mode prettier-js popwin pkgbuild-mode pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox ox-gfm overseer orgit org-super-agenda org-ref org-re-reveal org-projectile org-present org-pomodoro org-now org-mime org-download org-cliplink org-caldav org-brain open-junk-file ob-ipython nodejs-repl nim-mode nameless multi-term move-text monokai-theme mmm-mode markdown-toc magit-svn magit-gitflow macrostep lsp-ui lsp-treemacs lsp-python-ms lorem-ipsum livid-mode live-py-mode link-hint json-navigator json-mode js2-refactor js-doc jinja2-mode indent-guide importmagic impatient-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-org-rifle helm-org helm-mode-manager helm-make helm-lsp helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag graphviz-dot-mode google-translate golden-ratio gnuplot gitignore-templates github-search github-clone gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ git-auto-commit-mode gist gh-md fuzzy forge font-lock+ flyspell-correct-helm flycheck-rust flycheck-pos-tip flycheck-package flycheck-nim flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav ein editorconfig dumb-jump dotenv-mode doom-modeline diminish diff-hl devdocs define-word dap-mode cython-mode conda company-web company-tern company-statistics company-lsp company-ansible company-anaconda column-enforce-mode clean-aindent-mode centered-cursor-mode cargo browse-at-remote blacken auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile ansible-doc ansible aggressive-indent ace-link ace-jump-helm-line ac-ispell)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
