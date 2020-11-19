@@ -3,6 +3,8 @@
 
 ;; This contains all the org mode config to break it out of the main spacemacs
 ;; file.
+(setq org-directory "~/Notebooks/")
+(setq org-duration-format 'h:mm)
 
 ;; Plugins etc
 ;;;;;;;;;;;;;;
@@ -87,6 +89,20 @@
 (spacemacs/set-leader-keys "on" 'org-now)
 (spacemacs/set-leader-keys "ow" 'org-now-refile-to-now)
 (spacemacs/set-leader-keys "oW" 'org-now-refile-to-previous-location)
+
+;;; ORG-MODE:  * My Task
+;;;              SCHEDULED: <%%(diary-last-day-of-month date)>
+;;; DIARY:  %%(diary-last-day-of-month date) Last Day of the Month
+;;; See also:  (setq org-agenda-include-diary t)
+;;; (diary-last-day-of-month '(2 28 2017))
+(defun diary-last-day-of-month (date)
+  "Return `t` if DATE is the last day of the month."
+  (let* ((day (calendar-extract-day date))
+         (month (calendar-extract-month date))
+         (year (calendar-extract-year date))
+         (last-day-of-month
+          (calendar-last-day-of-month month year)))
+    (= day last-day-of-month)))
 
 ;; ORG MODE CALENDAR
 ;;;;;;;;;;;;;;;;;;;;
@@ -341,9 +357,8 @@
                             (org-tags-match-list-sublevels 'indented)
                             (org-agenda-sorting-strategy
                              '(category-keep))))
-                (tags-todo "dkist&-HOLD-CANCELLED/!"
-                           ((org-agenda-overriding-header "DKIST Projects")
-                            (org-agenda-skip-function 'bh/skip-non-projects)
+                (tags-todo "aperiocontracts&-HOLD-CANCELLED/!"
+                           ((org-agenda-overriding-header "Active Contracts")
                             (org-tags-match-list-sublevels 'indented)
                             (org-agenda-sorting-strategy
                              '(category-keep))))
