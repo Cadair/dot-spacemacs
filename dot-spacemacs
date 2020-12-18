@@ -523,6 +523,7 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   ;;                     :size 14
   ;;                     :weight normal
   ;;                     :width normal)))
+  (setq web-mode-markup-indent-offset 2) ; web-mode, html tag in html file
   )
 
 (defun dotspacemacs/user-config ()
@@ -535,7 +536,6 @@ layers configuration. You are free to put any user code."
   (spacemacs/toggle-indent-guide-globally-on)
   (require 'dap-node)
   (setq paradox-github-token t)
-
   ;; (with-eval-after-load "ispell"
   ;;   (setq ispell-program-name "hunspell")
   ;;   ;; ispell-set-spellchecker-params has to be called
