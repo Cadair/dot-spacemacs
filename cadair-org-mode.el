@@ -3,6 +3,129 @@
 
 ;; This contains all the org mode config to break it out of the main spacemacs
 ;; file.
+(setq org-directory "~/Notebooks/")
+(setq org-duration-format 'h:mm)
+
+;; Plugins etc
+;;;;;;;;;;;;;;
+
+(setq calendar-latitude 53.584)
+(setq calendar-longitude -1.778)
+(setq calendar-location-name "Holmfirth")
+
+(setq org-jira-working-dir "~/Notebooks/nso_jira/")
+(setq org-jira-worklog-sync-p nil)
+(setq org-jira-deadline-duedate-sync-p nil)
+(setq org-jira-jira-status-to-org-keyword-alist
+      '(("In Progress" . "WIP")
+        ("To Do" . "TODO")))
+(setq org-jira-download-comments nil)
+
+(setq request-log-level 'debug)
+(setq request-message-level 'debug)
+
+(use-package secretaria
+  :config
+  ;; use this for getting a reminder every 30 minutes of those tasks scheduled
+  ;; for today and which have no time of day defined.
+  (add-hook 'after-init-hook #'secretaria-unknown-time-always-remind-me))
+
+(setq secretaria-clocked-task-save-file "~/Notebooks/secretaria-clocked-task")
+(setq secretaria-notification-to-html t)
+
+
+(defun secretaria-remind-task-clocked-in ()
+  "Fires an alert for the user reminding him which task he is working on."
+  (when org-clock-current-task
+    (if (not org-clock-task-overrun)
+        (notifications-notify :body (secretaria--org-to-html org-clock-current-task)
+                              :title "Currently clocked"
+                              :severity 'trivial)
+      (notifications-notify :body (secretaria--org-to-html org-clock-current-task)
+             :title (format "Task effort exceeded (%s)" (secretaria-task-clocked-time))
+             :severity 'critical))))
+
+(defun secretaria-notification-handler (notification)
+  "Handle `org-mode' notifications.
+
+`NOTIFICATION' is, well, the notification from `org-mode'"
+  (if (not (s-contains? "should be finished by now" notification))
+      (notifications-notify :title notification :resident)
+    (notifications-notify :body (secretaria--org-to-html org-clock-current-task)
+                          :title (format "Task effort reached (%s)" (secretaria-task-clocked-time))
+                          :severity 'high
+                          :resident)))
+
+(defun secretaria-task-clocked-in ()
+  "Start a timer when a task is clocked-in."
+  (secretaria-task-save-clocked-task)
+  (setf secretaria-clocked-in-reminder-timer (run-at-time (format "%s min" (or secretaria-clocked-in-reminder-every-minutes 10)) (* (or secretaria-clocked-in-reminder-every-minutes 10) 60) 'secretaria-remind-task-clocked-in))
+  (notifications-notify :body(secretaria--org-to-html org-clock-current-task)
+                        :title (format "Task clocked in (%s)" (secretaria-task-clocked-time))))
+
+(defun secretaria-task-clocked-out ()
+  "Stop reminding the clocked-in task."
+  (secretaria--task-delete-save-clocked-task)
+  (ignore-errors (cancel-timer secretaria-clocked-in-reminder-timer))
+  (when org-clock-current-task
+    (notifications-notify :body(secretaria--org-to-html org-clock-current-task)
+                          :title (format "Task clocked out! (%s)" (secretaria-task-clocked-time))
+                          :severity 'critical)))
+
+(defun secretaria-task-clocked-canceled ()
+  "Stop reminding the clocked-in task if it's canceled."
+  (cancel-timer secretaria-clocked-in-reminder-timer)
+  (when org-clock-current-task
+    (notifications-notify :body(secretaria--org-to-html org-clock-current-task)
+                          :title (format "Task canceled! (%s)" (secretaria-task-clocked-time))
+                          :severity 'critical)))
+
+
+;; auto-save all org files every 10s
+;; (require 'real-auto-save)
+;; (add-hook 'org-mode-hook 'real-auto-save-mode)
+
+;; org-now config
+(spacemacs/set-leader-keys "on" 'org-now)
+(spacemacs/set-leader-keys "ow" 'org-now-refile-to-now)
+(spacemacs/set-leader-keys "oW" 'org-now-refile-to-previous-location)
+
+;;; ORG-MODE:  * My Task
+;;;              SCHEDULED: <%%(diary-last-day-of-month date)>
+;;; DIARY:  %%(diary-last-day-of-month date) Last Day of the Month
+;;; See also:  (setq org-agenda-include-diary t)
+;;; (diary-last-day-of-month '(2 28 2017))
+(defun diary-last-day-of-month (date)
+  "Return `t` if DATE is the last day of the month."
+  (let* ((day (calendar-extract-day date))
+         (month (calendar-extract-month date))
+         (year (calendar-extract-year date))
+         (last-day-of-month
+          (calendar-last-day-of-month month year)))
+    (= day last-day-of-month)))
+
+;; ORG MODE CALENDAR
+;;;;;;;;;;;;;;;;;;;;
+(require 'org-caldav)
+
+;; The CalDAV URL with your full and primary email address at the end.
+(setq org-caldav-url "https://apps.kolabnow.com/calendars/stuart%40cadair.com")
+
+;; The name of your calendar, typically "Calendar" or similar
+(setq org-caldav-calendar-id "f0472d6f-28d0-43c1-9375-ca6f0620c6a4")
+
+;; Local file that gets events from the server
+(setq org-caldav-inbox "~/Notebooks/calendar.org")
+
+;; List of your org files here
+(setq org-caldav-files '("~/Notebooks/calendar.org"))
+
+;; Please make sure to set your correct timezone here
+(setq org-icalendar-timezone "Europe/London")
+(setq org-icalendar-date-time-format ";TZID=%Z:%Y%m%dT%H%M%S")
+
+;; Put the syncstate in the Notebooks dir
+(setq org-caldav-save-directory "~/Notebooks/.caldav")
 
 ;; Export
 ;;;;;;;;;
@@ -42,7 +165,7 @@
 
 (defun cadair-jira-open (link)
   """Complete a link to a jira ticket"""
-  (setq ghlink (concat "https://nso-atst.atlassian.net/browse/DCS-" link))
+  (setq ghlink (concat "https://nso.atlassian.net/browse/DCS-" link))
   ;; (message ghlink)
   (org-open-link-from-string ghlink)
   )
@@ -71,7 +194,10 @@
       (delete-frame)))
 
 ;;file to save todo items
-(setq org-agenda-files (file-expand-wildcards "~/Notebooks/*.org"))
+(setq cadair-default-org-files (file-expand-wildcards "~/Notebooks/*.org"))
+(setq cadair-extra-org-files '("~/Notebooks/nso_jira/DCS.org"))
+
+(setq org-agenda-files (append cadair-default-org-files cadair-extra-org-files))
 
 ;;set priority range from A to C with default A
 (setq org-highest-priority ?A)
@@ -143,9 +269,8 @@
 ;;;;;;;;;;;;;;
 
 (setq org-todo-keywords
-      (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-              (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)")
-              (sequence "PROJECT" "|"))
+      (quote ((sequence "TODO(t)" "NEXT(n)" "WIP(i)" "|" "DONE(d)")
+              (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)"))
       )
 )
 
@@ -232,9 +357,8 @@
                             (org-tags-match-list-sublevels 'indented)
                             (org-agenda-sorting-strategy
                              '(category-keep))))
-                (tags-todo "dkist&-HOLD-CANCELLED/!"
-                           ((org-agenda-overriding-header "DKIST Projects")
-                            (org-agenda-skip-function 'bh/skip-non-projects)
+                (tags-todo "aperiocontracts&-HOLD-CANCELLED/!"
+                           ((org-agenda-overriding-header "Active Contracts")
                             (org-tags-match-list-sublevels 'indented)
                             (org-agenda-sorting-strategy
                              '(category-keep))))
