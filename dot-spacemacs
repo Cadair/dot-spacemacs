@@ -759,7 +759,11 @@ layers configuration. You are free to put any user code."
   ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-ignore ["D200"]))
 
   (defun cadair/run-restart-repl ()
-    "Get a new repl running"
+    "Run a new python repl in a window which does not have focus."
+    (interactive)
+    ;; For some reason the run-python function seems to have started grabbing the input.
+    ;; So we save the buffer when this function was triggered and then we swap back to it at the end.
+    (setq initial-buffer (current-buffer))
     (if (python-shell-get-process)
         (kill-buffer (python-shell-get-buffer))
       )
@@ -778,6 +782,8 @@ layers configuration. You are free to put any user code."
       (unless shell-process
         (error "Failed to start python shell properly"))
       )
+    (evil-normal-state)
+    (pop-to-buffer initial-buffer)
     )
 
   (defun cadair/run-in-repl (arg)
@@ -795,6 +801,7 @@ layers configuration. You are free to put any user code."
     )
 
   (spacemacs/set-leader-keys-for-major-mode 'python-mode
+    "R" 'cadair/run-restart-repl
     "e" 'cadair/run-in-repl
     "E" 'cadair/run-in-repl-switch)
 
