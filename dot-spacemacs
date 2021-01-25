@@ -61,7 +61,7 @@ This function should only modify configuration layer settings."
             shell-default-position 'bottom)
      (python :variables
              python-backend 'lsp
-             python-lsp-server 'pyls
+             python-lsp-server 'pyright
              ;; python-lsp-git-root "~/Git/python-language-server/"
              python-test-runner 'pytest)
      typescript
@@ -743,16 +743,16 @@ layers configuration. You are free to put any user code."
   ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   ;; lsp config
-  (custom-set-variables '(lsp-clients-python-library-directories '("/usr/" "/home/stuart/.virtualenvs/")))
-  (custom-set-variables '(lsp-pyls-configuration-sources ["flake8"]))
-  (custom-set-variables '(lsp-pyls-plugins-mccable-enabled nil))
-  (custom-set-variables '(lsp-pyls-plugins-pycodestyle-enabled t))
+  ;; (custom-set-variables '(lsp-clients-python-library-directories '("/usr/" "/home/stuart/.virtualenvs/")))
+  ;; (custom-set-variables '(lsp-pyls-configuration-sources ["flake8"]))
+  ;; (custom-set-variables '(lsp-pyls-plugins-mccable-enabled nil))
+  ;; (custom-set-variables '(lsp-pyls-plugins-pycodestyle-enabled t))
+  ;; (custom-set-variables '(lsp-pyls-plugins-pyflakes-enabled nil))
+  ;; (custom-set-variables '(lsp-pyls-plugins-pylint-enabled t))
+  ;; (custom-set-variables '(lsp-pyls-plugins-pyls_mypy-enabled t))
+  ;; (custom-set-variables '(lsp-pyls-plugins-pyls_mypy-live_mode nil))
+  ;; (custom-set-variables '(lsp-pyls-plugins-pylint-args ["--disable=R"]))
   ;; (custom-set-variables '(lsp-pyls-plugins-pycodestyle-ignore []))
-  (custom-set-variables '(lsp-pyls-plugins-pyflakes-enabled nil))
-  (custom-set-variables '(lsp-pyls-plugins-pylint-enabled t))
-  (custom-set-variables '(lsp-pyls-plugins-pyls_mypy-enabled t))
-  (custom-set-variables '(lsp-pyls-plugins-pyls_mypy-live_mode nil))
-  (custom-set-variables '(lsp-pyls-plugins-pylint-args ["--disable=R"]))
   ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-enabled nil))
   ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-convention "numpy"))
   ;; This isn't working for some reason. Can't use until it does lol.
