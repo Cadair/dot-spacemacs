@@ -737,6 +737,47 @@ layers configuration. You are free to put any user code."
   ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   ;; lsp config
+
+  (setq lsp-file-watch-threshold 2000)
+  (setq lsp-file-watch-ignored
+        '("[/\\\\]\\.git"
+          "[/\\\\]\\.hg"
+          "[/\\\\]\\.bzr"
+          "[/\\\\]_darcs"
+          "[/\\\\]\\.svn"
+          "[/\\\\]_FOSSIL_"
+          "[/\\\\]\\.idea"
+          "[/\\\\]\\.ensime_cache"
+          "[/\\\\]\\.eunit"
+          "[/\\\\]node_modules"
+          "[/\\\\]\\.fslckout"
+          "[/\\\\]\\.tox"
+          "[/\\\\]\\.hypothesis"
+          "[/\\\\]__pycache__"
+          "[/\\\\]\\.mypy_cache"
+          "[/\\\\]\\.pytest_cache"
+          "[/\\\\]_build"
+          "[/\\\\]\\.eggs"
+          "[/\\\\]\\.stack-work"
+          "[/\\\\]\\.bloop"
+          "[/\\\\]\\.metals"
+          "[/\\\\]target"
+          "[/\\\\]\\.ccls-cache"
+          "[/\\\\]\\.deps"
+          "[/\\\\]build-aux"
+          "[/\\\\]autom4te.cache"
+          "[/\\\\]\\.reference"
+
+          "[/\\\\]\\.docker"
+          "[/\\\\]dist-newstyle"
+          "[/\\\\]dist"
+          "[/\\\\]Documentation"
+          "[/\\\\]containers"
+          "[/\\\\]tf"
+          "[/\\\\]\\.semaphore"
+          "[/\\\\].*swp$"
+          "\./nix/materialized"))
+
   ;; (custom-set-variables '(lsp-clients-python-library-directories '("/usr/" "/home/stuart/.virtualenvs/")))
   ;; (custom-set-variables '(lsp-pyls-configuration-sources ["flake8"]))
   ;; (custom-set-variables '(lsp-pyls-plugins-mccable-enabled nil))
