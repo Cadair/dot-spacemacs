@@ -452,3 +452,9 @@
       (:strike-through t)))))
 
 (setq org-startup-folded nil)
+
+
+;; Waybar
+(load-file (expand-file-name "~/.config/spacemacs/org-clock-waybar/org-clock-waybar.el"))
+(org-clock-waybar-setup)
+(require 'org-clock-waybar)

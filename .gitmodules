@@ -1,3 +1,6 @@
 [submodule "ox-ipynb"]
 	path = ox-ipynb
 	url = https://github.com/jkitchin/ox-ipynb.git
+[submodule "org-clock-waybar"]
+	path = org-clock-waybar
+	url = https://gitea.polonkai.eu/Cadair/org-clock-waybar.git
