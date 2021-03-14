@@ -453,8 +453,17 @@
 
 (setq org-startup-folded nil)
 
-
 ;; Waybar
 (load-file (expand-file-name "~/.config/spacemacs/org-clock-waybar/org-clock-waybar.el"))
 (org-clock-waybar-setup)
 (require 'org-clock-waybar)
+
+(defun org-clock-waybar--get-tooltip ()
+  "The default tooltip to send to waybar."
+  (when (org-clocking-p)
+    (let ((clocked-time (org-clock-get-clocked-time)))
+      (format "%s: %s [%s] %s"
+              (org-clock-waybar--get-task-category)
+              (org-clock-waybar--get-task-title)
+              (org-duration-from-minutes clocked-time)
+              (format "%s" (org-clock-waybar--get-tags))))))
