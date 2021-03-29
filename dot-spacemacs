@@ -547,6 +547,7 @@ layers configuration. You are free to put any user code."
   ;;   (ispell-set-spellchecker-params)
   ;;   ;; (ispell-hunspell-add-multi-dic "en_GB")
   ;;   (setq ispell-dictionary "en_GB"))
+  (setq comp-async-report-warnings-errors nil)
 
   ;; Shortcut to start a terminal
   (spacemacs/set-leader-keys "at" 'ansi-term)
