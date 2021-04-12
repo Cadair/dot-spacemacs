@@ -644,7 +644,7 @@ layers configuration. You are free to put any user code."
   (require 'org-depend)
   (require 'ox-reveal)
   (setq org-roam-directory "~/Notebooks/roam")
-  (setq org-roam-db-location "~/Notebooks/roam/database.sqlite")
+  (setq org-roam-db-location "~/SyncBox/org-roam.db")
 
   (defun org-toc ()
     (interactive)
