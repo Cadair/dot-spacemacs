@@ -696,8 +696,8 @@ layers configuration. You are free to put any user code."
   ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   ;; lsp config
-
-  (setq lsp-file-watch-threshold 2000)
+  (setq lsp-pyright-diagnostic-mode "openFilesOnly")
+  (setq lsp-file-watch-threshold 100)
   (setq lsp-file-watch-ignored
         '("[/\\\\]\\.git"
           "[/\\\\]\\.hg"
