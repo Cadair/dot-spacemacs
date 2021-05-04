@@ -78,6 +78,7 @@ This function should only modify configuration layer settings."
      rust  ;; for toml
      (javascript :variables javascript-backend 'lsp)
      graphviz
+     vue
      ;; c-c++
 
      ;; random
@@ -548,6 +549,7 @@ layers configuration. You are free to put any user code."
   ;;   ;; (ispell-hunspell-add-multi-dic "en_GB")
   ;;   (setq ispell-dictionary "en_GB"))
   (setq comp-async-report-warnings-errors nil)
+  (setq comp-deferred-compilation nil)
 
   ;; Shortcut to start a terminal
   (spacemacs/set-leader-keys "at" 'ansi-term)
