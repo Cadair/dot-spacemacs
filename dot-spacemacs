@@ -534,6 +534,15 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
  This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
 
+  ;; Host specific Configuration
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; it looks for a file names <hostname>.el and loads it if present
+  ;; use it for require-ing different configs for each machine you use
+  (setq cadair-local-filename (concat system-name ".el"))
+  (setq cadair-local-file (expand-file-name cadair-local-filename "~/.config/spacemacs/"))
+  (when (file-readable-p cadair-local-file)
+    (load-file cadair-local-file))
+
   ;; General Spacemacs Tweaks
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (setq lsp-headerline-arrow "❱")
