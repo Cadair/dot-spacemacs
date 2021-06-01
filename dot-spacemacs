@@ -62,7 +62,7 @@ This function should only modify configuration layer settings."
             shell-default-position 'bottom)
      (python :variables
              python-backend 'lsp
-             python-lsp-server 'pyright
+             ;; python-lsp-server 'pyls
              python-test-runner 'pytest)
      typescript
      emacs-lisp
@@ -697,8 +697,11 @@ layers configuration. You are free to put any user code."
   ;; Python tweaks and stuff
   ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  ;; lsp config
+  (setq python-auto-set-local-pyvenv-virtualenv "on-project-switch")
+
+  ;; pyright lsp config
   (setq lsp-pyright-diagnostic-mode "openFilesOnly")
+  (setq lsp-enable-file-watchers nil)
   (setq lsp-file-watch-threshold 100)
   (setq lsp-file-watch-ignored
         '("[/\\\\]\\.git"
@@ -739,6 +742,7 @@ layers configuration. You are free to put any user code."
           "[/\\\\].*swp$"
           "\./nix/materialized"))
 
+  ;; pyls config
   ;; (custom-set-variables '(lsp-clients-python-library-directories '("/usr/" "/home/stuart/.virtualenvs/")))
   ;; (custom-set-variables '(lsp-pyls-configuration-sources ["flake8"]))
   ;; (custom-set-variables '(lsp-pyls-plugins-mccable-enabled nil))
