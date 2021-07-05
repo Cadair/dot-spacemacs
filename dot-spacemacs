@@ -34,8 +34,8 @@ This function should only modify configuration layer settings."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
-     ;; Tools
-     ;; restclient
+     ;;;; Tools
+     ;;;; restclient
      helm
      (auto-completion :variables
                       auto-completion-return-key-behavior 'complete
@@ -50,12 +50,10 @@ This function should only modify configuration layer settings."
      github
      imenu-list
 
-     ;; Languages
+     ;;;; Languages
      (org :variables
           org-enable-github-support t
-          org-enable-jira-support t
-          org-enable-roam-support t
-          jiralib-url "https://nso.atlassian.net"
+          org-enable-roam-support nil  ;; This breaks daemon
           org-enable-reveal-js-support t)
      (shell :variables
             shell-default-height 30
@@ -66,7 +64,6 @@ This function should only modify configuration layer settings."
              python-test-runner 'pytest)
      typescript
      emacs-lisp
-     nim
      ansible
      ipython-notebook
      yaml

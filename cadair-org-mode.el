@@ -360,17 +360,6 @@
           (tags "REFILE"
                 ((org-agenda-overriding-header "Tasks to Refile")
                  (org-tags-match-list-sublevels nil)))
-          ;; DKIST Projects
-          (tags-todo "dkist&activesprint&-HOLD-CANCELLED"
-                     ((org-agenda-overriding-header "Active Sprint Tasks")
-                      (org-tags-match-list-sublevels 'indented)
-                      (org-agenda-sorting-strategy
-                       '(category-keep))))
-          (tags-todo "aperiocontracts&-HOLD-CANCELLED/!"
-                     ((org-agenda-overriding-header "Active Contracts")
-                      (org-tags-match-list-sublevels 'indented)
-                      (org-agenda-sorting-strategy
-                       '(category-keep))))
           ;; Priority Tasks
           (tags-todo "+PRIORITY=\"A\"|+PRIORITY=\"B\""
                      (
@@ -382,6 +371,24 @@
                       (org-agenda-sorting-strategy
                        '(priority-down))
                       ))
+          ;; DKIST Sprint
+          (tags-todo "dkist&activesprint&-HOLD-CANCELLED"
+                     ((org-agenda-overriding-header "This Sprint Tasks")
+                      (org-tags-match-list-sublevels 'indented)
+                      (org-agenda-sorting-strategy
+                       '(category-keep))))
+          ;; DKIST Projects
+          (tags-todo "dkist&activemarathon&-HOLD-CANCELLED"
+                     ((org-agenda-overriding-header "This Marathon Tasks")
+                      (org-tags-match-list-sublevels 'indented)
+                      (org-agenda-sorting-strategy
+                       '(category-keep))))
+          ;; Active Contracts
+          (tags-todo "aperiocontracts&-HOLD-CANCELLED/!"
+                     ((org-agenda-overriding-header "Active Contracts")
+                      (org-tags-match-list-sublevels 'indented)
+                      (org-agenda-sorting-strategy
+                       '(category-keep))))
           ;; Waiting and Postponed
           (tags-todo "-CANCELLED+WAITING|HOLD/!"
                      ((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
