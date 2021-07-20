@@ -110,6 +110,7 @@ This function should only modify configuration layer settings."
                                       secretaria
                                       org-analyzer
                                       org-clock-convenience
+                                      htmlize
                                       )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -748,21 +749,14 @@ layers configuration. You are free to put any user code."
           "[/\\\\].*swp$"
           "\./nix/materialized"))
 
-  ;; pyls config
-  ;; (custom-set-variables '(lsp-clients-python-library-directories '("/usr/" "/home/stuart/.virtualenvs/")))
-  ;; (custom-set-variables '(lsp-pyls-configuration-sources ["flake8"]))
-  ;; (custom-set-variables '(lsp-pyls-plugins-mccable-enabled nil))
-  ;; (custom-set-variables '(lsp-pyls-plugins-pycodestyle-enabled t))
-  ;; (custom-set-variables '(lsp-pyls-plugins-pyflakes-enabled nil))
-  ;; (custom-set-variables '(lsp-pyls-plugins-pylint-enabled t))
-  ;; (custom-set-variables '(lsp-pyls-plugins-pyls_mypy-enabled t))
-  ;; (custom-set-variables '(lsp-pyls-plugins-pyls_mypy-live_mode nil))
-  ;; (custom-set-variables '(lsp-pyls-plugins-pylint-args ["--disable=R"]))
-  ;; (custom-set-variables '(lsp-pyls-plugins-pycodestyle-ignore []))
-  ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-enabled nil))
-  ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-convention "numpy"))
-  ;; This isn't working for some reason. Can't use until it does lol.
-  ;; (custom-set-variables '(lsp-pyls-plugins-pydocstyle-ignore ["D200"]))
+  ;; pylsp config
+  (custom-set-variables '(lsp-pylsp-configuration-sources ["flake8"]))
+  (custom-set-variables '(lsp-pylsp-plugins-mccabe-enabled nil))
+  (custom-set-variables '(lsp-pylsp-plugins-pycodestyle-enabled nil))
+  (custom-set-variables '(lsp-pylsp-plugins-pydocstyle-enabled nil))
+  (custom-set-variables '(lsp-pylsp-plugins-pyflakes-enabled nil))
+  (custom-set-variables '(lsp-pylsp-plugins-pylint-enabled nil))
+  (custom-set-variables '(lsp-pylsp-plugins-flake8-enabled t))
 
   (defun cadair/run-restart-repl ()
     "Run a new python repl in a window which does not have focus."
