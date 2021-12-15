@@ -111,6 +111,7 @@ This function should only modify configuration layer settings."
                                       org-analyzer
                                       org-clock-convenience
                                       htmlize
+                                      code-review
                                       )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -761,27 +762,11 @@ layers configuration. You are free to put any user code."
   (defun cadair/run-restart-repl ()
     "Run a new python repl in a window which does not have focus."
     (interactive)
-    ;; For some reason the run-python function seems to have started grabbing the input.
-    ;; So we save the buffer when this function was triggered and then we swap back to it at the end.
     (setq initial-buffer (current-buffer))
-    (if (python-shell-get-process)
-        (kill-buffer (python-shell-get-buffer))
-      )
-    (let ((shell-process
-           (or (python-shell-get-process)
-               ;; `run-python' has different return values and different
-               ;; errors in different emacs versions. In 24.4, it throws an
-               ;; error when the process didn't start, but in 25.1 it
-               ;; doesn't throw an error, so we demote errors here and
-               ;; check the process later
-               (with-demoted-errors "Error: %S"
-                 ;; in Emacs 24.5 and 24.4, `run-python' doesn't return the
-                 ;; shell process
-                 (call-interactively #'run-python)
-                 (python-shell-get-process)))))
-      (unless shell-process
-        (error "Failed to start python shell properly"))
-      )
+    (if (python-shell-get-buffer)
+        (kill-buffer (python-shell-get-buffer)))
+    (run-python)
+    (pop-to-buffer (python-shell-get-buffer))
     (evil-normal-state)
     (pop-to-buffer initial-buffer)
     )
@@ -790,7 +775,7 @@ layers configuration. You are free to put any user code."
     "Run a python buffer in a new ipython repl"
     (interactive "P")
     (cadair/run-restart-repl)
-    (spacemacs/python-shell-send-buffer)
+    (python-shell-send-buffer)
     )
 
   (defun cadair/run-in-repl-switch (arg)
@@ -841,7 +826,8 @@ layers configuration. You are free to put any user code."
   ;; Reset shell
   (setenv "SHELL" "/usr/bin/bash")
   ;; (setq explicit-shell-file-name "/bin/xonsh")
- )
+  )
+
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
