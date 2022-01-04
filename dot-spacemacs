@@ -60,7 +60,7 @@ This function should only modify configuration layer settings."
             shell-default-position 'bottom)
      (python :variables
              python-backend 'lsp
-             ;; python-lsp-server 'pyls
+             python-lsp-server 'pylsp
              python-test-runner 'pytest)
      typescript
      emacs-lisp
