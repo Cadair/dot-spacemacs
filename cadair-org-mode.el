@@ -195,7 +195,7 @@
 
 ;;file to save todo items
 (setq cadair-default-org-files (file-expand-wildcards "~/Notebooks/*.org"))
-(setq cadair-extra-org-files '("~/Notebooks/nso_jira/DCS.org"))
+(setq cadair-extra-org-files '())
 
 (setq org-agenda-files (append cadair-default-org-files cadair-extra-org-files))
 
