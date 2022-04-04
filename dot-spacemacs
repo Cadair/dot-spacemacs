@@ -397,7 +397,7 @@ It should only modify the values of Spacemacs settings."
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's active or selected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
-   dotspacemacs-active-transparency 100
+   dotspacemacs-active-transparency 70
 
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's inactive or deselected.
@@ -753,10 +753,10 @@ layers configuration. You are free to put any user code."
   ;; pylsp config
   ;; (custom-set-variables '(lsp-pylsp-configuration-sources ["flake8"]))
   (custom-set-variables '(lsp-pylsp-plugins-mccabe-enabled nil))
-  (custom-set-variables '(lsp-pylsp-plugins-pycodestyle-enabled nil))
+  (custom-set-variables '(lsp-pylsp-plugins-pycodestyle-enabled t))
   (custom-set-variables '(lsp-pylsp-plugins-pydocstyle-enabled nil))
   (custom-set-variables '(lsp-pylsp-plugins-pyflakes-enabled t))
-  (custom-set-variables '(lsp-pylsp-plugins-pylint-enabled t))
+  (custom-set-variables '(lsp-pylsp-plugins-pylint-enabled nil))
   (custom-set-variables '(lsp-pylsp-plugins-flake8-enabled nil))
 
   (defun cadair/run-restart-repl ()
@@ -775,14 +775,14 @@ layers configuration. You are free to put any user code."
     "Run a python buffer in a new ipython repl"
     (interactive "P")
     (cadair/run-restart-repl)
-    (python-shell-send-buffer)
+    (run-at-time 0.5 nil 'python-shell-send-buffer)
     )
 
   (defun cadair/run-in-repl-switch (arg)
     "Run a python buffer in a new ipython repl"
     (interactive "P")
     (cadair/run-restart-repl)
-    (spacemacs/python-shell-send-buffer-switch)
+    (run-at-time 0.5 nil 'spacemacs/python-shell-send-buffer-switch)
     )
 
   (spacemacs/set-leader-keys-for-major-mode 'python-mode
@@ -860,7 +860,8 @@ This function is called at the very end of Spacemacs initialization."
  '(package-selected-packages
    '(magit-todos dockerfile-mode docker tablist docker-tramp evil-collection annalist org-clock-convenience ox-jira org-jira tide typescript-mode import-js grizzl add-node-modules-path yasnippet-snippets yapfify yaml-mode xterm-color xkcd ws-butler writeroom-mode winum which-key web-mode web-beautify volatile-highlights vmd-mode vi-tilde-fringe uuidgen treemacs-projectile treemacs-evil toml-mode toc-org tagedit systemd symon symbol-overlay string-inflection spaceline-all-the-icons smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs real-auto-save ranger rainbow-delimiters racer quelpa-use-package pytest pyenv-mode py-isort pug-mode prettier-js popwin pkgbuild-mode pippel pipenv pip-requirements persp-mode pcre2el password-generator paradox ox-gfm overseer orgit org-super-agenda org-ref org-re-reveal org-projectile org-present org-pomodoro org-now org-mime org-download org-cliplink org-caldav org-brain open-junk-file ob-ipython nodejs-repl nim-mode nameless multi-term move-text monokai-theme mmm-mode markdown-toc magit-svn magit-gitflow macrostep lsp-ui lsp-treemacs lsp-python-ms lorem-ipsum livid-mode live-py-mode link-hint json-navigator json-mode js2-refactor js-doc jinja2-mode indent-guide importmagic impatient-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-org-rifle helm-org helm-mode-manager helm-make helm-lsp helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag graphviz-dot-mode google-translate golden-ratio gnuplot gitignore-templates github-search github-clone gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ git-auto-commit-mode gist gh-md fuzzy forge font-lock+ flyspell-correct-helm flycheck-rust flycheck-pos-tip flycheck-package flycheck-nim flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav ein editorconfig dumb-jump dotenv-mode doom-modeline diminish diff-hl devdocs define-word dap-mode cython-mode company-web company-tern company-statistics company-lsp company-ansible company-anaconda column-enforce-mode clean-aindent-mode centered-cursor-mode cargo browse-at-remote blacken auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile ansible-doc ansible aggressive-indent ace-link ace-jump-helm-line ac-ispell))
  '(warning-suppress-types
-   '((use-package)
+   '(((python python-shell-completion-native-turn-on-maybe))
+     (use-package)
      ((python python-shell-completion-native-turn-on-maybe)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
