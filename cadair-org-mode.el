@@ -6,6 +6,10 @@
 (setq org-directory "~/Notebooks/")
 (setq org-duration-format 'h:mm)
 
+
+(add-hook 'org-clock-in-hook #'save-buffer)
+(add-hook 'org-clock-out-hook #'save-buffer)
+
 ;; Plugins etc
 ;;;;;;;;;;;;;;
 
