@@ -76,6 +76,7 @@ This function should only modify configuration layer settings."
      graphviz
      vue
      (c-c++ :variables c-c++-backend 'lsp-ccls)
+     php
 
      ;; random
      xkcd
