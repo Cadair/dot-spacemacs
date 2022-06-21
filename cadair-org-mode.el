@@ -478,3 +478,39 @@
               (org-clock-waybar--get-task-title)
               (org-duration-from-minutes clocked-time)
               (format "%s" (org-clock-waybar--get-tags))))))
+
+;; Gantt Charts
+(require 'elgantt)
+(setq elgantt-start-date "2020-01-01")
+(setq elgantt-agenda-files "~/.emacs.d/.cache/quelpa/build/elgantt/test.org")
+(setq elgantt-header-type 'outline
+      elgantt-insert-blank-line-between-top-level-header t
+      elgantt-startup-folded nil
+      elgantt-show-header-depth t
+      elgantt-draw-overarching-headers t)
+(setq elgantt-user-set-color-priority-counter 0)
+(elgantt-create-display-rule draw-scheduled-to-deadline
+  :parser ((elgantt-color . ((when-let ((colors (org-entry-get (point) "ELGANTT-COLOR")))
+                               (s-split " " colors)))))
+  :args (elgantt-scheduled elgantt-color elgantt-org-id)
+  :body ((when elgantt-scheduled
+           (let ((point1 (point))
+                 (point2 (save-excursion
+                           (elgantt--goto-date elgantt-scheduled)
+                           (point)))
+                 (color1 (or (car elgantt-color)
+                             "black"))
+                 (color2 (or (cadr elgantt-color)
+                             "red")))
+             (when (/= point1 point2)
+               (elgantt--draw-gradient
+                color1
+                color2
+                (if (< point1 point2) point1 point2) ;; Since cells are not necessarily linked in
+                (if (< point1 point2) point2 point1) ;; chronological order, make sure they are sorted
+                nil
+                `(priority ,(setq elgantt-user-set-color-priority-counter
+                                  (1- elgantt-user-set-color-priority-counter))
+                           ;; Decrease the priority so that earlier entries take
+                           ;; precedence over later ones (note: it doesn’t matter if the number is negative)
+                           :elgantt-user-overlay ,elgantt-org-id)))))))
