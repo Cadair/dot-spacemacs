@@ -550,6 +550,7 @@ layers configuration. You are free to put any user code."
 
   ;; General Spacemacs Tweaks
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (spacemacs/toggle-smartparens-globally-off)
   (setq lsp-headerline-arrow "❱")
   (spacemacs/toggle-indent-guide-globally-on)
   (require 'dap-node)
