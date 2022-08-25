@@ -77,6 +77,7 @@ This function should only modify configuration layer settings."
      vue
      (c-c++ :variables c-c++-backend 'lsp-ccls)
      php
+     dart
 
      ;; random
      xkcd
