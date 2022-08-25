@@ -115,6 +115,12 @@ This function should only modify configuration layer settings."
                                       htmlize
                                       code-review
                                       (uwu-theme :location (recipe :fetcher github :repo "kborling/uwu-theme"))
+                                      ;; elgantt deps
+                                      org-ql
+                                      s
+                                      dash
+                                      ts
+                                      (elgantt :location (recipe :fetcher github :repo "legalnonsense/elgantt"))
                                       )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -546,6 +552,7 @@ layers configuration. You are free to put any user code."
 
   ;; General Spacemacs Tweaks
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (spacemacs/toggle-smartparens-globally-off)
   (setq lsp-headerline-arrow "❱")
   (spacemacs/toggle-indent-guide-globally-on)
   (require 'dap-node)
