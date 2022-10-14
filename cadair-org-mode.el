@@ -342,6 +342,8 @@
 ;;                                 ))
 
 ;; Custom agenda command definitions
+(setq org-agenda-start-with-log-mode t)
+(setq org-agenda-start-with-clockreport-mode t)
 
 (setq org-agenda-custom-commands
       (quote
@@ -364,6 +366,12 @@
           (tags "REFILE"
                 ((org-agenda-overriding-header "Tasks to Refile")
                  (org-tags-match-list-sublevels nil)))
+          ;; Reoccurring Tasks
+          (tags-todo "+reoccurring-HOLD-CANCELLED"
+                     ((org-agenda-overriding-header "Reoccurring Tasks")
+                      (org-tags-match-list-sublevels nil)
+                      (org-agenda-sorting-strategy
+                       '(category-keep))))
           ;; Priority Tasks
           (tags-todo "+PRIORITY=\"A\"|+PRIORITY=\"B\""
                      (
@@ -378,6 +386,12 @@
           ;; DKIST Sprint
           (tags-todo "dkist&activesprint&-HOLD-CANCELLED"
                      ((org-agenda-overriding-header "This Sprint Tasks")
+                      (org-tags-match-list-sublevels 'indented)
+                      (org-agenda-sorting-strategy
+                       '(category-keep))))
+          ;; NASA Grant
+          (tags-todo "sunpy&billable&-HOLD-CANCELLED"
+                     ((org-agenda-overriding-header "SunPy NASA Tasks")
                       (org-tags-match-list-sublevels 'indented)
                       (org-agenda-sorting-strategy
                        '(category-keep))))
