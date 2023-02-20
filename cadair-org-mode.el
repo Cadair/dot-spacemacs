@@ -17,14 +17,6 @@
 (setq calendar-longitude -1.778)
 (setq calendar-location-name "Holmfirth")
 
-(setq org-jira-working-dir "~/Notebooks/nso_jira/")
-(setq org-jira-worklog-sync-p nil)
-(setq org-jira-deadline-duedate-sync-p nil)
-(setq org-jira-jira-status-to-org-keyword-alist
-      '(("In Progress" . "WIP")
-        ("To Do" . "TODO")))
-(setq org-jira-download-comments nil)
-
 (setq request-log-level 'debug)
 (setq request-message-level 'debug)
 
@@ -90,9 +82,9 @@
 ;; (add-hook 'org-mode-hook 'real-auto-save-mode)
 
 ;; org-now config
-(spacemacs/set-leader-keys "on" 'org-now)
-(spacemacs/set-leader-keys "ow" 'org-now-refile-to-now)
-(spacemacs/set-leader-keys "oW" 'org-now-refile-to-previous-location)
+;; (spacemacs/set-leader-keys "on" 'org-now)
+;; (spacemacs/set-leader-keys "ow" 'org-now-refile-to-now)
+;; (spacemacs/set-leader-keys "oW" 'org-now-refile-to-previous-location)
 
 ;;; ORG-MODE:  * My Task
 ;;;              SCHEDULED: <%%(diary-last-day-of-month date)>
@@ -107,29 +99,6 @@
          (last-day-of-month
           (calendar-last-day-of-month month year)))
     (= day last-day-of-month)))
-
-;; ORG MODE CALENDAR
-;;;;;;;;;;;;;;;;;;;;
-(require 'org-caldav)
-
-;; The CalDAV URL with your full and primary email address at the end.
-(setq org-caldav-url "https://apps.kolabnow.com/calendars/stuart%40cadair.com")
-
-;; The name of your calendar, typically "Calendar" or similar
-(setq org-caldav-calendar-id "f0472d6f-28d0-43c1-9375-ca6f0620c6a4")
-
-;; Local file that gets events from the server
-(setq org-caldav-inbox "~/Notebooks/calendar.org")
-
-;; List of your org files here
-(setq org-caldav-files '("~/Notebooks/calendar.org"))
-
-;; Please make sure to set your correct timezone here
-(setq org-icalendar-timezone "Europe/London")
-(setq org-icalendar-date-time-format ";TZID=%Z:%Y%m%dT%H%M%S")
-
-;; Put the syncstate in the Notebooks dir
-(setq org-caldav-save-directory "~/Notebooks/.caldav")
 
 ;; Export
 ;;;;;;;;;
@@ -326,21 +295,6 @@
 
 (defvar bh/hide-scheduled-and-waiting-next-tasks t)
 
-;; org-super-agenda
-;; (require 'org-super-agenda)
-;; (org-super-agenda-mode)
-;; (setq org-super-agenda-groups '(
-;;                                 (:name "Overdue"
-;;                                        :deadline past
-;;                                        :scheduled past)
-;;                                 (:name "Today"
-;;                                        :time-grid t
-;;                                        )
-;;                                 (:name "High Priority"
-;;                                        :priority "A"
-;;                                        )
-;;                                 ))
-
 ;; Custom agenda command definitions
 (setq org-agenda-start-with-log-mode t)
 (setq org-agenda-start-with-clockreport-mode t)
@@ -492,39 +446,3 @@
               (org-clock-waybar--get-task-title)
               (org-duration-from-minutes clocked-time)
               (format "%s" (org-clock-waybar--get-tags))))))
-
-;; Gantt Charts
-(require 'elgantt)
-(setq elgantt-start-date "2020-01-01")
-(setq elgantt-agenda-files "~/.emacs.d/.cache/quelpa/build/elgantt/test.org")
-(setq elgantt-header-type 'outline
-      elgantt-insert-blank-line-between-top-level-header t
-      elgantt-startup-folded nil
-      elgantt-show-header-depth t
-      elgantt-draw-overarching-headers t)
-(setq elgantt-user-set-color-priority-counter 0)
-(elgantt-create-display-rule draw-scheduled-to-deadline
-  :parser ((elgantt-color . ((when-let ((colors (org-entry-get (point) "ELGANTT-COLOR")))
-                               (s-split " " colors)))))
-  :args (elgantt-scheduled elgantt-color elgantt-org-id)
-  :body ((when elgantt-scheduled
-           (let ((point1 (point))
-                 (point2 (save-excursion
-                           (elgantt--goto-date elgantt-scheduled)
-                           (point)))
-                 (color1 (or (car elgantt-color)
-                             "black"))
-                 (color2 (or (cadr elgantt-color)
-                             "red")))
-             (when (/= point1 point2)
-               (elgantt--draw-gradient
-                color1
-                color2
-                (if (< point1 point2) point1 point2) ;; Since cells are not necessarily linked in
-                (if (< point1 point2) point2 point1) ;; chronological order, make sure they are sorted
-                nil
-                `(priority ,(setq elgantt-user-set-color-priority-counter
-                                  (1- elgantt-user-set-color-priority-counter))
-                           ;; Decrease the priority so that earlier entries take
-                           ;; precedence over later ones (note: it doesn’t matter if the number is negative)
-                           :elgantt-user-overlay ,elgantt-org-id)))))))

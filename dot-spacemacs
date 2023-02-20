@@ -698,9 +698,6 @@ layers configuration. You are free to put any user code."
     (load-file (expand-file-name "~/.config/spacemacs/cadair-org-mode.el"))
     ;; (load-file (expand-file-name "~/.config/spacemacs/ox-confluence.el"))
 
-    (require 'ox-confluence)
-    ;; End Org Mode Section
-    )
 
   ;; GPG Encryption
   ;;;;;;;;;;;;;;;;;
