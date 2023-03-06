@@ -697,7 +697,7 @@ layers configuration. You are free to put any user code."
     (load-file (expand-file-name "~/.config/spacemacs/bh-org.el"))
     (load-file (expand-file-name "~/.config/spacemacs/cadair-org-mode.el"))
     ;; (load-file (expand-file-name "~/.config/spacemacs/ox-confluence.el"))
-
+  )
 
   ;; GPG Encryption
   ;;;;;;;;;;;;;;;;;
