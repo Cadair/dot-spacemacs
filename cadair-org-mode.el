@@ -312,6 +312,13 @@
                       (org-agenda-filter-by-tag 'billable)
                       ))
           ))
+        ("n" "Noodling Agenda"
+         ((agenda "" (
+                      (org-agenda-span (quote day))
+                      (org-agenda-skip-scheduled-if-deadline-is-shown nil)
+                      (org-agenda-filter-by-tag 'noodling)
+                      ))
+          ))
         ("p" "Primary Agenda"
          ((agenda "" (
                       (org-agenda-span (quote day))
