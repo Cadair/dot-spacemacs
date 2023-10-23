@@ -453,3 +453,25 @@
               (org-clock-waybar--get-task-title)
               (org-duration-from-minutes clocked-time)
               (format "%s" (org-clock-waybar--get-tags))))))
+
+;; Float Integration
+(defun org-clock-float--get-tags ()
+  "Get the tags of the currently clocked-in task."
+  (when (org-clocking-p)
+    (or (org-with-point-at org-clock-marker (org-get-tags))
+        "")
+    ))
+
+(defsubst org-clock-float--get-task-title ()
+  "Get the title of TASK."
+  (when (org-clocking-p) (substring-no-properties org-clock-current-task)))
+
+(defun org-clock-float-post ()
+  "On clock out post the clock to Float."
+  (let*
+        ;; tags (org-clock-float--get-tags)
+        title (org-clock-float--get-task-title)
+        clocked-time (org-clock-get-clocked-time)
+        (message "%s %s" title clocked-time)
+  )
+)
